@@ -16,6 +16,26 @@ export default function HomeScreen() {
     await sound.playAsync();
   };
 
+  const playAnimalSound = async (animal: string) => {
+  let soundFile;
+
+  if (animal === 'dog') {
+    soundFile = require('../../assets/sounds/dog.mp3');
+  }
+
+  if (animal === 'cat') {
+    soundFile = require('../../assets/sounds/cat.mp3');
+  }
+
+  if (animal === 'cow') {
+    soundFile = require('../../assets/sounds/cow.mp3');
+  }
+
+  const { sound } = await Audio.Sound.createAsync(soundFile);
+
+  await sound.playAsync();
+};
+
   // 🗣️ Speak name
   const speakName = () => {
     if (!name) return;
@@ -63,17 +83,80 @@ export default function HomeScreen() {
   }
 
   // 🟢 SCREEN 2: Toddler Mode
-  if (mode === 'toddler') {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center',backgroundColor: 'white'}}>
-        <Text style={{ fontSize: 22 }}>🐶 Animal Game Coming Soon</Text>
+if (mode === 'toddler') {
+  return (
+    <View style={{
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'white'
+    }}>
 
-        <TouchableOpacity onPress={() => setMode(null)}>
-          <Text style={{ marginTop: 20 }}>⬅ Back</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+      <Text style={{ fontSize: 28, marginBottom: 30 }}>
+        🐾 Animal Sounds
+      </Text>
+
+      {/* DOG */}
+      <TouchableOpacity
+        onPress={() => playAnimalSound('dog')}
+        style={{
+          backgroundColor: '#FFD54F',
+          padding: 20,
+          borderRadius: 20,
+          marginBottom: 15,
+          width: 200,
+          alignItems: 'center'
+        }}
+      >
+        <Text style={{ fontSize: 24 }}>
+          🐶 Dog
+        </Text>
+      </TouchableOpacity>
+
+      {/* CAT */}
+      <TouchableOpacity
+        onPress={() => playAnimalSound('cat')}
+        style={{
+          backgroundColor: '#81C784',
+          padding: 20,
+          borderRadius: 20,
+          marginBottom: 15,
+          width: 200,
+          alignItems: 'center'
+        }}
+      >
+        <Text style={{ fontSize: 24 }}>
+          🐱 Cat
+        </Text>
+      </TouchableOpacity>
+
+      {/* COW */}
+      <TouchableOpacity
+        onPress={() => playAnimalSound('cow')}
+        style={{
+          backgroundColor: '#64B5F6',
+          padding: 20,
+          borderRadius: 20,
+          marginBottom: 15,
+          width: 200,
+          alignItems: 'center'
+        }}
+      >
+        <Text style={{ fontSize: 24 }}>
+          🐮 Cow
+        </Text>
+      </TouchableOpacity>
+
+      {/* BACK */}
+      <TouchableOpacity onPress={() => setMode(null)}>
+        <Text style={{ marginTop: 20, color: 'blue' }}>
+          ⬅ Back
+        </Text>
+      </TouchableOpacity>
+
+    </View>
+  );
+}
 
   // 🔵 SCREEN 3: Big Kids Mode (your current app)
   if (mode === 'big') {
