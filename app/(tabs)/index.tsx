@@ -7,6 +7,8 @@ export default function HomeScreen() {
   const [name, setName] = useState('');
   const [language, setLanguage] = useState('en');
   const [mode, setMode] = useState<string | null>(null);
+  const [targetAnimal, setTargetAnimal] = useState<any>(null);
+  const [score, setScore] = useState(0);
 
   // 🔊 Play sound
   const playSound = async () => {
@@ -16,25 +18,34 @@ export default function HomeScreen() {
     await sound.playAsync();
   };
 
-  const playAnimalSound = async (animal: string) => {
-  let soundFile;
-
-  if (animal === 'dog') {
-    soundFile = require('../../assets/sounds/dog.mp3');
-  }
-
-  if (animal === 'cat') {
-    soundFile = require('../../assets/sounds/cat.mp3');
-  }
-
-  if (animal === 'cow') {
-    soundFile = require('../../assets/sounds/cow.mp3');
-  }
-
+  const playAnimalSound = async (soundFile: any) => {
   const { sound } = await Audio.Sound.createAsync(soundFile);
 
   await sound.playAsync();
 };
+
+
+
+const animals = [
+  {
+    name: 'Dog',
+    emoji: '🐶',
+    sound: require('../../assets/sounds/dog.mp3'),
+    color: '#FFD54F'
+  },
+  {
+    name: 'Cat',
+    emoji: '🐱',
+    sound: require('../../assets/sounds/cat.mp3'),
+    color: '#81C784'
+  },
+  {
+    name: 'Cow',
+    emoji: '🐮',
+    sound: require('../../assets/sounds/cow.mp3'),
+    color: '#64B5F6'
+  }
+];
 
   // 🗣️ Speak name
   const speakName = () => {
@@ -47,6 +58,13 @@ export default function HomeScreen() {
 
     Speech.speak(text);
   };
+
+  // Random animal function 
+  const chooseRandomAnimal = () => {
+  const randomIndex = Math.floor(Math.random() * animals.length);
+
+  setTargetAnimal(animals[randomIndex]);
+};
 
   // 🟡 SCREEN 1: Mode Selection
   if (!mode) {
@@ -73,7 +91,7 @@ export default function HomeScreen() {
           style={{
             backgroundColor: '#3F51B5',
             padding: 15,
-            borderRadius: 20
+            borderRadius: 20 
           }}
         >
           <Text style={{ color: 'white' }}>🧒 Big Kids</Text>
@@ -92,60 +110,64 @@ if (mode === 'toddler') {
       backgroundColor: 'white'
     }}>
 
+
       <Text style={{ fontSize: 28, marginBottom: 30 }}>
-        🐾 Animal Sounds
+      🐾 Animal Sounds
+      </Text>
+      <Text style={{ fontSize: 22, marginBottom: 20 }}>
+        ⭐ Score: {score}
       </Text>
 
-      {/* DOG */}
-      <TouchableOpacity
-        onPress={() => playAnimalSound('dog')}
-        style={{
-          backgroundColor: '#FFD54F',
-          padding: 20,
-          borderRadius: 20,
-          marginBottom: 15,
-          width: 200,
-          alignItems: 'center'
-        }}
-      >
-        <Text style={{ fontSize: 24 }}>
-          🐶 Dog
-        </Text>
-      </TouchableOpacity>
+  <TouchableOpacity
+    onPress={chooseRandomAnimal}
+    style={{
+    backgroundColor: '#E91E63',
+    padding: 15,
+    borderRadius: 20,
+    marginBottom: 20
+    }}
+    >
+    <Text style={{ color: 'white', fontSize: 18 }}>
+      🎯 Start Challenge
+    </Text>
+  </TouchableOpacity>
 
-      {/* CAT */}
-      <TouchableOpacity
-        onPress={() => playAnimalSound('cat')}
-        style={{
-          backgroundColor: '#81C784',
-          padding: 20,
-          borderRadius: 20,
-          marginBottom: 15,
-          width: 200,
-          alignItems: 'center'
-        }}
-      >
-        <Text style={{ fontSize: 24 }}>
-          🐱 Cat
-        </Text>
-      </TouchableOpacity>
+  {targetAnimal && (
+    <Text style={{ fontSize: 24, marginBottom: 20 }}>
+      Find the {targetAnimal.name}
+    </Text>
+  )}
 
-      {/* COW */}
-      <TouchableOpacity
-        onPress={() => playAnimalSound('cow')}
-        style={{
-          backgroundColor: '#64B5F6',
-          padding: 20,
-          borderRadius: 20,
-          marginBottom: 15,
-          width: 200,
-          alignItems: 'center'
-        }}
-      >
-        <Text style={{ fontSize: 24 }}>
-          🐮 Cow
-        </Text>
-      </TouchableOpacity>
+      {animals.map((animal) => (
+  <TouchableOpacity
+    key={animal.name}
+    onPress={() => {
+    playAnimalSound(animal.sound);
+
+    if (targetAnimal?.name === animal.name) {
+      setScore(score + 1);
+      Speech.speak('Great Job!');
+      chooseRandomAnimal();
+    } else {
+    Speech.speak('Try Again');
+    }
+  }}
+
+    style={{
+      backgroundColor: animal.color,
+      padding: 20,
+      borderRadius: 20,
+      marginBottom: 15,
+      width: 200,
+      alignItems: 'center'
+    }}
+  >
+    <Text style={{ fontSize: 24 }}>
+      {animal.emoji} {animal.name}
+    </Text>
+  </TouchableOpacity>
+  
+))}
 
       {/* BACK */}
       <TouchableOpacity onPress={() => setMode(null)}>
