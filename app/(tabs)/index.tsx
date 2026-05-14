@@ -1,7 +1,9 @@
 import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 import { useState } from 'react';
-import { Animated, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Animated, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import AnimalCard from '../../components/AnimalCard';
+
 
 
 
@@ -13,6 +15,8 @@ export default function HomeScreen() {
   const [score, setScore] = useState(0);
   const scaleAnim = useState(new Animated.Value(1))[0];
   const [selectedAnimal, setSelectedAnimal] = useState('');
+  const [showStars, setShowStars] = useState(false);
+  const [level, setLevel] = useState(1);
 
   const animateButton = () => {
   Animated.sequence([
@@ -51,23 +55,35 @@ export default function HomeScreen() {
 const animals = [
   {
     name: 'Dog',
-    emoji: '🐶',
+    image: require('../../assets/images/dog.png'),
     sound: require('../../assets/sounds/dog.mp3'),
     color: '#FFD54F'
   },
   {
     name: 'Cat',
-    emoji: '🐱',
+    image: require('../../assets/images/cat.png'),
     sound: require('../../assets/sounds/cat.mp3'),
     color: '#81C784'
   },
   {
     name: 'Cow',
-    emoji: '🐮',
+    image: require('../../assets/images/cow.png'),
     sound: require('../../assets/sounds/cow.mp3'),
     color: '#64B5F6'
+  }, 
+  {
+  name: 'Lion',
+  image: require('../../assets/images/lion.png'),
+  sound: require('../../assets/sounds/lion.mp3'),
+  color: '#FF7043'
+  },
+  {
+  name: 'Duck',
+  image: require('../../assets/images/duck.png'),
+  sound: require('../../assets/sounds/duck.mp3'),
+  color: '#4FC3F7'
   }
-];
+ ];
 
   // 🗣️ Speak name
   const speakName = () => {
@@ -124,13 +140,16 @@ const animals = [
 
 if (mode === 'toddler') {
   return (
-    <View style={{
-      flex: 1,
+    <ScrollView
+      contentContainerStyle={{
+      flexGrow: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#FFF8E1'
-    }}>
-
+      backgroundColor: '#FFF8E1',
+      paddingVertical: 40
+        }}
+      
+      >
       {/* TITLE */}
       <Text style={{
         fontSize: 36,
@@ -142,7 +161,14 @@ if (mode === 'toddler') {
 
       {/* SCORE */}
       <Text style={{ fontSize: 22, marginBottom: 20 }}>
-        ⭐ Score: {score}
+        ⭐ Score: {score}{showStars && (
+        <Text style={{
+        fontSize: 40,
+        marginBottom: 20
+      }}>
+    ⭐⭐⭐
+  </Text>
+)}
       </Text>
 
       {/* START CHALLENGE BUTTON */}
@@ -169,64 +195,39 @@ if (mode === 'toddler') {
 
       {/* ANIMAL BUTTONS */}
       {animals.map((animal) => (
-        <Animated.View
-          key={animal.name}
-          style={{
-            transform: [
-              {
-                scale:
-                  selectedAnimal === animal.name
-                    ? scaleAnim
-                    : 1
-              }
-            ]
-          }}
-        >
-          <TouchableOpacity
-            onPress={() => {
+    <AnimalCard
+      key={animal.name}
+      animal={animal}
+      selectedAnimal={selectedAnimal}
+      scaleAnim={scaleAnim}
+      onPress={() => {
 
-              // SELECT CURRENT ANIMAL
-              setSelectedAnimal(animal.name);
+    setSelectedAnimal(animal.name);
 
-              // ANIMATE
-              animateButton();
+    animateButton();
 
-              // PLAY SOUND
-              playAnimalSound(animal.sound);
+    playAnimalSound(animal.sound);
 
-              // CHECK ANSWER
-              if (targetAnimal?.name === animal.name) {
+    if (targetAnimal?.name === animal.name) {
 
-                // INCREASE SCORE
-                setScore(score + 1);
+      setScore(score + 1);
 
-                // SPEAK
-                Speech.speak('Great Job!');
+      setShowStars(true);
 
-                // NEXT CHALLENGE
-                chooseRandomAnimal();
+      Speech.speak('Great Job!');
 
-              } else {
+      setTimeout(() => {
+        setShowStars(false);
+      }, 1500);
 
-                Speech.speak('Try Again');
-              }
-            }}
-            style={{
-              backgroundColor: animal.color,
-              paddingVertical: 25,
-              paddingHorizontal: 20,
-              borderRadius: 20,
-              marginBottom: 15,
-              width: 220,
-              alignItems: 'center',
-              elevation: 5
-            }}
-          >
-            <Text style={{ fontSize: 32 }}>
-              {animal.emoji} {animal.name}
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
+      chooseRandomAnimal();
+
+      } else {
+
+      Speech.speak('Try Again');
+      }
+    }}
+    />
       ))}
 
       {/* BACK BUTTON */}
@@ -240,7 +241,7 @@ if (mode === 'toddler') {
         </Text>
       </TouchableOpacity>
 
-    </View>
+    </ScrollView>
   );
 }
 
