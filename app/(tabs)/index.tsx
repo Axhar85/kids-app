@@ -74,16 +74,18 @@ const animals = [
   {
   name: 'Lion',
   image: require('../../assets/images/lion.png'),
-  sound: require('../../assets/sounds/lion.mp3'),
+  sound: require('../../assets/sounds/cat.mp3'),
   color: '#FF7043'
   },
   {
   name: 'Duck',
   image: require('../../assets/images/duck.png'),
-  sound: require('../../assets/sounds/duck.mp3'),
+  sound: require('../../assets/sounds/cow.mp3'),
   color: '#4FC3F7'
   }
  ];
+
+ const visibleAnimals = animals.slice(0, level + 2);
 
   // 🗣️ Speak name
   const speakName = () => {
@@ -99,10 +101,12 @@ const animals = [
 
   // Random animal function 
   const chooseRandomAnimal = () => {
-  const randomIndex = Math.floor(Math.random() * animals.length);
+  const randomIndex = Math.floor(
+    Math.random() * visibleAnimals.length
+    );
 
-  setTargetAnimal(animals[randomIndex]);
-};
+    setTargetAnimal(visibleAnimals[randomIndex]);
+  };
 
   // 🟡 SCREEN 1: Mode Selection
   if (!mode) {
@@ -160,16 +164,22 @@ if (mode === 'toddler') {
       </Text>
 
       {/* SCORE */}
-      <Text style={{ fontSize: 22, marginBottom: 20 }}>
-        ⭐ Score: {score}{showStars && (
-        <Text style={{
-        fontSize: 40,
-        marginBottom: 20
-      }}>
-    ⭐⭐⭐
-  </Text>
-)}
+      <Text style={{ fontSize: 22, marginBottom: 10 }}>
+        ⭐ Score: {score}
       </Text>
+
+      {showStars && (
+    <Text style={{
+      fontSize: 40,
+      marginBottom: 20
+    }}>
+     ⭐⭐⭐
+   </Text>
+  )}
+
+    <Text style={{ fontSize: 22, marginBottom: 10 }}>
+  🏆 Level: {level}
+    </Text>
 
       {/* START CHALLENGE BUTTON */}
       <TouchableOpacity
@@ -194,7 +204,7 @@ if (mode === 'toddler') {
       )}
 
       {/* ANIMAL BUTTONS */}
-      {animals.map((animal) => (
+      {visibleAnimals.map((animal) => (
     <AnimalCard
       key={animal.name}
       animal={animal}
@@ -226,6 +236,12 @@ if (mode === 'toddler') {
 
       Speech.speak('Try Again');
       }
+
+      if ((score + 1) % 3 === 0) {
+        setLevel(level + 1);
+
+      Speech.speak('Level Up!');
+    }
     }}
     />
       ))}
