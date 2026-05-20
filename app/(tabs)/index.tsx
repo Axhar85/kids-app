@@ -14,6 +14,8 @@ export default function HomeScreen() {
   const [language, setLanguage] = useState('en');
   const [mode, setMode] = useState<string | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
+  
+  console.log('Current Profile:', selectedProfile);
 
   const {
     targetAnimal,
@@ -29,8 +31,8 @@ export default function HomeScreen() {
     setShowStars,
     chooseRandomAnimal,
     setLevel,
-    handleAnimalPress
-  } = useToddlerGame();
+    handleAnimalPress,
+  } = useToddlerGame(selectedProfile);
 
 
 

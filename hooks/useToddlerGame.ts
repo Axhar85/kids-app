@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Animated } from 'react-native';
 import animals from '../data/animals';
 
-export default function useToddlerGame() {
+export default function useToddlerGame(selectedProfile: string | null) {
 
   const [targetAnimal, setTargetAnimal] = useState<any>(null);
   const [score, setScore] = useState(0);
@@ -14,6 +14,12 @@ export default function useToddlerGame() {
   const [level, setLevel] = useState(1);
 
   const scaleAnim = useState(new Animated.Value(1))[0];
+
+  useEffect(() => {
+  if (selectedProfile) {
+    loadProgress();
+  }
+}, [selectedProfile]);
 
   // ANIMATION
   const animateButton = () => {
@@ -61,7 +67,10 @@ export default function useToddlerGame() {
     playAnimalSound(animal.sound);
 
     if (targetAnimal?.name === animal.name) {
-
+        console.log('Correct animal clicked');
+        console.log('CORRECT ANSWER');
+        console.log('Profile:', selectedProfile);
+        
       setScore(score + 1);
       saveProgress(score + 1, level);
 
@@ -76,7 +85,7 @@ export default function useToddlerGame() {
       chooseRandomAnimal();
 
       if ((score + 1) % 3 === 0) {
-
+        
         setLevel(level + 1);
         saveProgress(score + 1, level + 1);
 
@@ -92,19 +101,25 @@ export default function useToddlerGame() {
   // Save function
   const saveProgress = async (
   newScore: number,
-  newLevel: number
+  newLevel: number,
 ) => {
+    
+  console.log('Saving profile:', selectedProfile);
+  console.log('Saving score:', newScore);
+  console.log('Saving level:', newLevel);
 
   try {
 
+    if (!selectedProfile) return;
+
     await AsyncStorage.setItem(
-      'score',
-      JSON.stringify(newScore)
+    `score_${selectedProfile}`,
+        JSON.stringify(newScore)
     );
 
     await AsyncStorage.setItem(
-      'level',
-      JSON.stringify(newLevel)
+    `level_${selectedProfile}`,
+    JSON.stringify(newLevel)
     );
 
   } catch (error) {
@@ -116,11 +131,20 @@ export default function useToddlerGame() {
 
     // Load function
     const loadProgress = async () => {
-
+        
   try {
 
-    const savedScore = await AsyncStorage.getItem('score');
-    const savedLevel = await AsyncStorage.getItem('level');
+    if (!selectedProfile) return;
+
+    const savedScore =
+    await AsyncStorage.getItem(
+    `score_${selectedProfile}`
+    );
+
+    const savedLevel =
+    await AsyncStorage.getItem(
+    `level_${selectedProfile}`
+    );
 
     if (savedScore !== null) {
       setScore(JSON.parse(savedScore));
@@ -129,16 +153,17 @@ export default function useToddlerGame() {
     if (savedLevel !== null) {
       setLevel(JSON.parse(savedLevel));
     }
-
+console.log('Loading profile:', selectedProfile);
+console.log('Saved score:', savedScore);
+console.log('Saved level:', savedLevel);
   } catch (error) {
 
     console.log('Load error', error);
   }
+  
 };
 
-    useEffect(() => {
-  loadProgress();
-}, []);
+
 
   return {
     targetAnimal,

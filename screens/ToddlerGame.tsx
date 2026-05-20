@@ -1,4 +1,3 @@
-import * as Speech from 'expo-speech';
 import { ScrollView, Text, TouchableOpacity } from 'react-native';
 
 import AnimalCard from '../components/AnimalCard';
@@ -19,7 +18,8 @@ export default function ToddlerGame({
   chooseRandomAnimal,
   setLevel,
   handleAnimalPress,
-  setMode
+  setMode,
+  
 }: any) {
 
   const visibleAnimals = animals.slice(0, level + 2);
@@ -89,44 +89,11 @@ export default function ToddlerGame({
       {/* ANIMALS */}
       {visibleAnimals.map((animal) => (
         <AnimalCard
-          key={animal.name}
-          animal={animal}
-          selectedAnimal={selectedAnimal}
-          scaleAnim={scaleAnim}
-          onPress={() => {
-
-            setSelectedAnimal(animal.name);
-
-            animateButton();
-
-            playAnimalSound(animal.sound);
-
-            if (targetAnimal?.name === animal.name) {
-
-              setScore(score + 1);
-
-              setShowStars(true);
-
-              Speech.speak('Great Job!');
-
-              setTimeout(() => {
-                setShowStars(false);
-              }, 1500);
-
-              chooseRandomAnimal();
-
-              if ((score + 1) % 3 === 0) {
-
-                setLevel(level + 1);
-
-                Speech.speak('Level Up!');
-              }
-
-            } else {
-
-              Speech.speak('Try Again');
-            }
-          }}
+            key={animal.name}
+            animal={animal}
+            selectedAnimal={selectedAnimal}
+            scaleAnim={scaleAnim}
+            onPress={() => handleAnimalPress(animal)}
         />
       ))}
 
