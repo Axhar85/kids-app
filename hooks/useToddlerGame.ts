@@ -12,6 +12,8 @@ export default function useToddlerGame(selectedProfile: string | null) {
   const [selectedAnimal, setSelectedAnimal] = useState('');
   const [showStars, setShowStars] = useState(false);
   const [level, setLevel] = useState(1);
+  const [badge, setBadge] = useState('');
+  const [showBadgePopup, setShowBadgePopup] = useState(false);
 
   const scaleAnim = useState(new Animated.Value(1))[0];
 
@@ -57,6 +59,34 @@ export default function useToddlerGame(selectedProfile: string | null) {
     setTargetAnimal(visibleAnimals[randomIndex]);
   };
 
+
+  // Badge
+  const checkBadge = (newScore: number) => {
+
+  let newBadge = '';
+
+  if (newScore >= 10) {
+    newBadge = '🥇 Animal Master';
+  }
+  else if (newScore >= 5) {
+    newBadge = '🥈 Animal Expert';
+  }
+  else if (newScore >= 1) {
+    newBadge = '🥉 Animal Explorer';
+  }
+
+  if (newBadge && newBadge !== badge) {
+
+    setBadge(newBadge);
+
+    setShowBadgePopup(true);
+
+    setTimeout(() => {
+      setShowBadgePopup(false);
+    }, 2000);
+
+  }
+};
   // HANDLE PRESS
   const handleAnimalPress = (animal: any) => {
 
@@ -67,32 +97,36 @@ export default function useToddlerGame(selectedProfile: string | null) {
     playAnimalSound(animal.sound);
 
     if (targetAnimal?.name === animal.name) {
-        console.log('Correct animal clicked');
-        console.log('CORRECT ANSWER');
-        console.log('Profile:', selectedProfile);
-        
-      setScore(score + 1);
-      saveProgress(score + 1, level);
 
-      setShowStars(true);
+  const newScore = score + 1;
 
-      Speech.speak('Great Job!');
+  setScore(newScore);
 
-      setTimeout(() => {
-        setShowStars(false);
-      }, 1500);
+  checkBadge(newScore);
 
-      chooseRandomAnimal();
+  saveProgress(newScore, level);
 
-      if ((score + 1) % 3 === 0) {
-        
-        setLevel(level + 1);
-        saveProgress(score + 1, level + 1);
+  setShowStars(true);
 
-        Speech.speak('Level Up!');
-      }
+  Speech.speak('Great Job!');
 
-    } else {
+  setTimeout(() => {
+    setShowStars(false);
+  }, 1500);
+
+  chooseRandomAnimal();
+
+  if (newScore % 3 === 0) {
+
+    setLevel(level + 1);
+
+    saveProgress(newScore, level + 1);
+
+    Speech.speak('Level Up!');
+  }
+
+}
+ else {
 
       Speech.speak('Try Again');
     }
@@ -179,6 +213,8 @@ console.log('Saved level:', savedLevel);
     setShowStars,
     chooseRandomAnimal,
     setLevel,
-    handleAnimalPress
+    handleAnimalPress,
+    badge,
+    showBadgePopup,
   };
 }

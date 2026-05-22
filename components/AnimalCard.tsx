@@ -27,7 +27,7 @@ export default function AnimalCard({
           paddingHorizontal: 20,
           borderRadius: 20,
           marginBottom: 15,
-          width: 220,
+          width: 160,
           alignItems: 'center',
           elevation: 5
         }}
@@ -35,8 +35,8 @@ export default function AnimalCard({
         <Image
           source={animal.image}
           style={{
-            width: 100,
-            height: 100,
+            width: 90,
+            height: 90,
             marginBottom: 10
           }}
         />

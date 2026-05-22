@@ -32,6 +32,8 @@ export default function HomeScreen() {
     chooseRandomAnimal,
     setLevel,
     handleAnimalPress,
+    badge,
+    showBadgePopup,
   } = useToddlerGame(selectedProfile);
 
 
@@ -97,6 +99,8 @@ export default function HomeScreen() {
       setLevel={setLevel}
       setMode={setMode}
       handleAnimalPress={handleAnimalPress}
+      badge={badge}
+      showBadgePopup={showBadgePopup}
     />
   );
 }

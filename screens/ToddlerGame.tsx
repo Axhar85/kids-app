@@ -1,7 +1,9 @@
-import { ScrollView, Text, TouchableOpacity } from 'react-native';
+import { FlatList, ScrollView, Text, TouchableOpacity } from 'react-native';
 
 import AnimalCard from '../components/AnimalCard';
+import GameHeader from '../components/GameHeader';
 import animals from '../data/animals';
+
 
 export default function ToddlerGame({
   score,
@@ -19,12 +21,23 @@ export default function ToddlerGame({
   setLevel,
   handleAnimalPress,
   setMode,
+  badge,
+  showBadgePopup,
   
 }: any) {
 
   const visibleAnimals = animals.slice(0, level + 2);
 
   return (
+
+  <>
+    <GameHeader
+      score={score}
+      level={level}
+      badge={badge}
+      showBadgePopup={showBadgePopup}
+    />
+
     <ScrollView
       contentContainerStyle={{
         flexGrow: 1,
@@ -34,20 +47,9 @@ export default function ToddlerGame({
         paddingVertical: 40
       }}
     >
+     
 
-      {/* TITLE */}
-      <Text style={{
-        fontSize: 36,
-        fontWeight: 'bold',
-        marginBottom: 20
-      }}>
-        🎮 Fun Animal Game
-      </Text>
 
-      {/* SCORE */}
-      <Text style={{ fontSize: 22, marginBottom: 10 }}>
-        ⭐ Score: {score}
-      </Text>
 
       {/* STARS */}
       {showStars && (
@@ -59,10 +61,7 @@ export default function ToddlerGame({
         </Text>
       )}
 
-      {/* LEVEL */}
-      <Text style={{ fontSize: 22, marginBottom: 10 }}>
-        🏆 Level: {level}
-      </Text>
+
 
       {/* START CHALLENGE */}
       <TouchableOpacity
@@ -87,15 +86,20 @@ export default function ToddlerGame({
       )}
 
       {/* ANIMALS */}
-      {visibleAnimals.map((animal) => (
-        <AnimalCard
-            key={animal.name}
-            animal={animal}
-            selectedAnimal={selectedAnimal}
-            scaleAnim={scaleAnim}
-            onPress={() => handleAnimalPress(animal)}
+    <FlatList
+        data={visibleAnimals}
+        keyExtractor={(item) => item.name}
+        numColumns={2}
+        scrollEnabled={false}
+        renderItem={({ item }) => (
+    <AnimalCard
+        animal={item}
+        selectedAnimal={selectedAnimal}
+        scaleAnim={scaleAnim}
+        onPress={() => handleAnimalPress(item)}
         />
-      ))}
+        )}
+    />
 
       {/* BACK */}
       <TouchableOpacity onPress={() => setMode(null)}>
@@ -109,5 +113,6 @@ export default function ToddlerGame({
       </TouchableOpacity>
 
     </ScrollView>
+    </>
   );
 }
