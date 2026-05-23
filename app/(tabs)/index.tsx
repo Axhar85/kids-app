@@ -2,11 +2,12 @@ import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 import { useState } from 'react';
 import useToddlerGame from '../../hooks/useToddlerGame';
+import BadgesScreen from '../../screens/BadgesScreen';
 import BigKidsGame from '../../screens/BigKidsGame';
+import MemoryGame from '../../screens/MemoryGame';
 import ModeSelection from '../../screens/ModeSelection';
 import ProfileSelection from '../../screens/ProfileSelection';
 import ToddlerGame from '../../screens/ToddlerGame';
-
 
 
 export default function HomeScreen() {
@@ -14,6 +15,7 @@ export default function HomeScreen() {
   const [language, setLanguage] = useState('en');
   const [mode, setMode] = useState<string | null>(null);
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
+  const [showBadges, setShowBadges] = useState(false);
   
   console.log('Current Profile:', selectedProfile);
 
@@ -80,6 +82,14 @@ export default function HomeScreen() {
   );
 }
 
+if (showBadges) {
+  return (
+    <BadgesScreen
+      badge={badge}
+      setShowBadges={setShowBadges}
+    />
+  );
+}
 
   if (mode === 'toddler') {
   return (
@@ -101,6 +111,14 @@ export default function HomeScreen() {
       handleAnimalPress={handleAnimalPress}
       badge={badge}
       showBadgePopup={showBadgePopup}
+      setShowBadges={setShowBadges}
+    />
+  );
+}
+if (mode === 'memory') {
+  return (
+    <MemoryGame
+      setMode={setMode}
     />
   );
 }

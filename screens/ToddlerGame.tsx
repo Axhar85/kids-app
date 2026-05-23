@@ -23,6 +23,7 @@ export default function ToddlerGame({
   setMode,
   badge,
   showBadgePopup,
+  setShowBadges,
   
 }: any) {
 
@@ -61,7 +62,24 @@ export default function ToddlerGame({
         </Text>
       )}
 
-
+      <TouchableOpacity
+         onPress={() => setShowBadges(true)}
+        style={{
+        backgroundColor: '#673AB7',
+        padding: 10,
+        borderRadius: 15,
+        marginBottom: 20,
+          }}
+      >
+    <Text
+        style={{
+        color: 'white',
+        fontSize: 18,
+        }}
+     >
+    🏅 My Badges
+    </Text>
+    </TouchableOpacity>
 
       {/* START CHALLENGE */}
       <TouchableOpacity

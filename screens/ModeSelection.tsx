@@ -77,6 +77,27 @@ export default function ModeSelection({
           🧒 Big Kids
         </Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => setMode('memory')}
+        style={{
+        backgroundColor: '#009688',
+        paddingVertical: 15,
+        paddingHorizontal: 30,
+        borderRadius: 20,
+        width: 220,
+        alignItems: 'center',
+        marginTop: 15,
+        }}
+    >
+    <Text
+        style={{
+        color: 'white',
+        fontSize: 20,
+        }}
+    >
+        🧩 Memory Game
+    </Text>
+    </TouchableOpacity>
     </View>
   );
 }
