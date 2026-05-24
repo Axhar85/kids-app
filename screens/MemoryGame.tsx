@@ -1,73 +1,94 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
 
-
-
 export default function MemoryGame({
   setMode,
 }: any) {
+  const [flipped, setFlipped] = useState<number[]>([]);
+  const [matched, setMatched] = useState<number[]>([]);
+  const [cards, setCards] = useState<string[]>([]);
+  const [score, setScore] = useState(0);
+  const [won, setWon] = useState(false);
 
-  const cards = [
-    '🐶',
-    '🐶',
-    '🐱',
-    '🐱',
-    '🐮',
-    '🐮',
-  ];
+  useEffect(() => {
+    shuffleCards();
+  }, []);
 
+  const shuffleCards = () => {
+    const cardList = [
+      '🐶', '🐶',
+      '🐱', '🐱',
+      '🐮', '🐮',
+      '🦁', '🦁',
+      '🦆', '🦆',
+      '🐵', '🐵',
+    ];
 
-    const [flipped, setFlipped] = useState<number[]>([]);
-    const [matched, setMatched] = useState<number[]>([]);
+    const shuffled = [...cardList].sort(
+      () => Math.random() - 0.5
+    );
 
-const handleCardPress = (index: number) => {
+    setCards(shuffled);
+  };
 
-  if (
-    flipped.includes(index) ||
-    matched.includes(index)
-  ) {
-    return;
-  }
+  const restartGame = () => {
+    shuffleCards();
 
-  const newFlipped = [
-    ...flipped,
-    index,
-  ];
+    setFlipped([]);
+    setMatched([]);
+    setScore(0);
+    setWon(false);
+  };
 
-  setFlipped(newFlipped);
-
-  if (newFlipped.length === 2) {
-
-    const firstCard =
-      cards[newFlipped[0]];
-
-    const secondCard =
-      cards[newFlipped[1]];
-
-    if (firstCard === secondCard) {
-
-      setMatched([
-        ...matched,
-        ...newFlipped,
-      ]);
-
-      setFlipped([]);
-
-    } else {
-
-      setTimeout(() => {
-        setFlipped([]);
-      }, 1000);
-
+  const handleCardPress = (index: number) => {
+    if (
+      flipped.includes(index) ||
+      matched.includes(index)
+    ) {
+      return;
     }
 
-  }
+    const newFlipped = [
+      ...flipped,
+      index,
+    ];
 
-};
+    setFlipped(newFlipped);
+
+    if (newFlipped.length === 2) {
+      const firstCard =
+        cards[newFlipped[0]];
+
+      const secondCard =
+        cards[newFlipped[1]];
+
+      if (firstCard === secondCard) {
+        setScore(score + 1);
+
+        const newMatched = [
+          ...matched,
+          ...newFlipped,
+        ];
+
+        setMatched(newMatched);
+
+        if (newMatched.length === cards.length) {
+          setWon(true);
+        }
+
+        setFlipped([]);
+      } else {
+        setTimeout(() => {
+          setFlipped([]);
+        }, 1000);
+      }
+    }
+  };
+
   return (
     <View
       style={{
@@ -87,22 +108,77 @@ const handleCardPress = (index: number) => {
         🧩 Memory Game
       </Text>
 
+      <Text
+        style={{
+          fontSize: 22,
+          marginBottom: 20,
+        }}
+      >
+        🏆 Score: {score}
+      </Text>
+
+      {won && (
+        <View
+          style={{
+            alignItems: 'center',
+            marginBottom: 20,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 30,
+              fontWeight: 'bold',
+              color: 'green',
+            }}
+          >
+            🎉 YOU WIN! 🎉
+          </Text>
+
+          <Text
+            style={{
+              fontSize: 22,
+              marginTop: 10,
+            }}
+          >
+            Final Score: {score}
+          </Text>
+
+          <TouchableOpacity
+            onPress={restartGame}
+            style={{
+              backgroundColor: '#4CAF50',
+              padding: 12,
+              borderRadius: 15,
+              marginTop: 15,
+            }}
+          >
+            <Text
+              style={{
+                color: 'white',
+                fontSize: 18,
+              }}
+            >
+              🔄 Play Again
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <View
         style={{
           flexDirection: 'row',
           flexWrap: 'wrap',
-          width: 240,
+          width: 320,
           justifyContent: 'center',
         }}
       >
         {cards.map((card, index) => (
-
           <TouchableOpacity
             key={index}
             onPress={() => handleCardPress(index)}
             style={{
-              width: 70,
-              height: 70,
+              width: 80,
+              height: 80,
               backgroundColor: '#4FC3F7',
               margin: 5,
               justifyContent: 'center',
@@ -121,7 +197,6 @@ const handleCardPress = (index: number) => {
                 : '❓'}
             </Text>
           </TouchableOpacity>
-
         ))}
       </View>
 
