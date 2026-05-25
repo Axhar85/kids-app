@@ -13,20 +13,50 @@ export default function MemoryGame({
   const [cards, setCards] = useState<string[]>([]);
   const [score, setScore] = useState(0);
   const [won, setWon] = useState(false);
+  const [difficulty, setDifficulty] = useState('medium');
 
   useEffect(() => {
-    shuffleCards();
-  }, []);
+  shuffleCards();
+}, [difficulty]);
 
   const shuffleCards = () => {
-    const cardList = [
-      '🐶', '🐶',
-      '🐱', '🐱',
-      '🐮', '🐮',
-      '🦁', '🦁',
-      '🦆', '🦆',
-      '🐵', '🐵',
-    ];
+    let cardList: string[] = [];
+
+if (difficulty === 'easy') {
+
+  cardList = [
+    '🐶','🐶',
+    '🐱','🐱',
+    '🐮','🐮',
+  ];
+
+} else if (difficulty === 'medium') {
+
+  cardList = [
+    '🐶','🐶',
+    '🐱','🐱',
+    '🐮','🐮',
+    '🦁','🦁',
+    '🦆','🦆',
+    '🐵','🐵',
+  ];
+
+} else {
+
+  cardList = [
+    '🐶','🐶',
+    '🐱','🐱',
+    '🐮','🐮',
+    '🦁','🦁',
+    '🦆','🦆',
+    '🐵','🐵',
+    '🐸','🐸',
+    '🐼','🐼',
+    '🐷','🐷',
+    '🐰','🐰',
+  ];
+
+}
 
     const shuffled = [...cardList].sort(
       () => Math.random() - 0.5
@@ -35,14 +65,24 @@ export default function MemoryGame({
     setCards(shuffled);
   };
 
-  const restartGame = () => {
-    shuffleCards();
 
-    setFlipped([]);
-    setMatched([]);
-    setScore(0);
-    setWon(false);
-  };
+    const resetGame = () => {
+
+  setFlipped([]);
+
+  setMatched([]);
+
+  setScore(0);
+
+  setWon(false);
+};
+
+    const restartGame = () => {
+
+    resetGame();
+
+    shuffleCards();
+    };
 
   const handleCardPress = (index: number) => {
     if (
@@ -107,6 +147,67 @@ export default function MemoryGame({
       >
         🧩 Memory Game
       </Text>
+
+      <View
+  style={{
+    flexDirection: 'row',
+    marginBottom: 20,
+  }}
+>
+
+  <TouchableOpacity
+    onPress={() => {
+      resetGame();
+      setDifficulty('easy');
+    }}
+    style={{
+      backgroundColor: '#4CAF50',
+      padding: 10,
+      margin: 5,
+      borderRadius: 10,
+    }}
+  >
+    <Text style={{ color: 'white' }}>
+      Easy
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    onPress={() => {
+      resetGame();
+      setDifficulty('medium');
+    }}
+    style={{
+      backgroundColor: '#FFC107',
+      padding: 10,
+      margin: 5,
+      borderRadius: 10,
+    }}
+  >
+    <Text>
+      Medium
+    </Text>
+  </TouchableOpacity>
+
+  <TouchableOpacity
+    onPress={() => {
+      resetGame();
+      setDifficulty('hard');
+    }}
+    style={{
+      backgroundColor: '#F44336',
+      padding: 10,
+      margin: 5,
+      borderRadius: 10,
+    }}
+  >
+    <Text style={{ color: 'white' }}>
+      Hard
+    </Text>
+  </TouchableOpacity>
+
+</View>
+
 
       <Text
         style={{
