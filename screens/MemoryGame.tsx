@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+    ScrollView,
     Text,
     TouchableOpacity,
     View,
@@ -265,6 +266,12 @@ if (difficulty === 'easy') {
         </View>
       )}
 
+        <ScrollView
+            style={{
+            maxHeight: '60%'
+            }}
+        >            
+ 
       <View
         style={{
           flexDirection: 'row',
@@ -300,6 +307,7 @@ if (difficulty === 'easy') {
           </TouchableOpacity>
         ))}
       </View>
+        </ScrollView>
 
       <TouchableOpacity
         onPress={() => setMode(null)}
