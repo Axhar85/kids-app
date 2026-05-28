@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import {
-    ScrollView,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function MemoryGame({
@@ -15,6 +15,7 @@ export default function MemoryGame({
   const [score, setScore] = useState(0);
   const [won, setWon] = useState(false);
   const [difficulty, setDifficulty] = useState('medium');
+  const [stars, setStars] = useState(0);
 
   useEffect(() => {
   shuffleCards();
@@ -118,8 +119,20 @@ if (difficulty === 'easy') {
         setMatched(newMatched);
 
         if (newMatched.length === cards.length) {
-          setWon(true);
+
+        setWon(true);
+
+          if (difficulty === 'easy') {
+        setStars(1);
+         }
+        else if (difficulty === 'medium') {
+        setStars(2);
         }
+      else {
+       setStars(3);
+        }
+
+      }
 
         setFlipped([]);
       } else {
@@ -243,7 +256,15 @@ if (difficulty === 'easy') {
             }}
           >
             Final Score: {score}
-          </Text>
+              <Text
+                style={{
+                fontSize: 40,
+                marginTop: 10,
+                }}
+                  >
+                {'⭐'.repeat(stars)}
+              </Text>
+            </Text>
 
           <TouchableOpacity
             onPress={restartGame}
