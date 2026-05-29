@@ -1,5 +1,7 @@
+import { Audio } from 'expo-av';
 import { useEffect, useState } from 'react';
 import {
+  Image,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -9,84 +11,121 @@ import {
 export default function MemoryGame({
   setMode,
 }: any) {
+
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<number[]>([]);
-  const [cards, setCards] = useState<string[]>([]);
+  const [cards, setCards] = useState<any[]>([]);
   const [score, setScore] = useState(0);
   const [won, setWon] = useState(false);
   const [difficulty, setDifficulty] = useState('medium');
   const [stars, setStars] = useState(0);
 
+  const animalCards = [
+    {
+      image: require('../assets/images/dog.png'),
+    },
+    {
+      image: require('../assets/images/cat.png'),
+    },
+    {
+      image: require('../assets/images/cow.png'),
+    },
+    {
+      image: require('../assets/images/lion.png'),
+    },
+    {
+      image: require('../assets/images/duck.png'),
+    },
+    {
+      image: require('../assets/images/monkey.png'),
+    },
+  ];
+
   useEffect(() => {
-  shuffleCards();
-}, [difficulty]);
+    shuffleCards();
+  }, [difficulty]);
 
   const shuffleCards = () => {
-    let cardList: string[] = [];
 
-if (difficulty === 'easy') {
+    let selectedAnimals: any[] = [];
 
-  cardList = [
-    '🐶','🐶',
-    '🐱','🐱',
-    '🐮','🐮',
-  ];
+    if (difficulty === 'easy') {
 
-} else if (difficulty === 'medium') {
+      selectedAnimals =
+        animalCards.slice(0, 3);
 
-  cardList = [
-    '🐶','🐶',
-    '🐱','🐱',
-    '🐮','🐮',
-    '🦁','🦁',
-    '🦆','🦆',
-    '🐵','🐵',
-  ];
+    } else if (difficulty === 'medium') {
 
-} else {
+      selectedAnimals =
+        animalCards.slice(0, 6);
 
-  cardList = [
-    '🐶','🐶',
-    '🐱','🐱',
-    '🐮','🐮',
-    '🦁','🦁',
-    '🦆','🦆',
-    '🐵','🐵',
-    '🐸','🐸',
-    '🐼','🐼',
-    '🐷','🐷',
-    '🐰','🐰',
-  ];
+    } else {
 
-}
+      selectedAnimals =
+        animalCards;
 
-    const shuffled = [...cardList].sort(
-      () => Math.random() - 0.5
-    );
+    }
+
+    const duplicated = [
+      ...selectedAnimals,
+      ...selectedAnimals,
+    ];
+
+    const shuffled =
+      [...duplicated].sort(
+        () => Math.random() - 0.5
+      );
 
     setCards(shuffled);
   };
 
+  const resetGame = () => {
 
-    const resetGame = () => {
+    setFlipped([]);
+    setMatched([]);
+    setScore(0);
+    setWon(false);
+    setStars(0);
+  };
 
-  setFlipped([]);
-
-  setMatched([]);
-
-  setScore(0);
-
-  setWon(false);
-};
-
-    const restartGame = () => {
+  const restartGame = () => {
 
     resetGame();
-
     shuffleCards();
-    };
+  };
+
+  const playCorrectSound = async () => {
+
+    const { sound } =
+      await Audio.Sound.createAsync(
+        require('../assets/sounds/correct.mp3')
+      );
+
+    await sound.playAsync();
+  };
+
+  const playWrongSound = async () => {
+
+    const { sound } =
+      await Audio.Sound.createAsync(
+        require('../assets/sounds/wrong.mp3')
+      );
+
+    await sound.playAsync();
+  };
+
+  const playWinSound = async () => {
+
+    const { sound } =
+      await Audio.Sound.createAsync(
+        require('../assets/sounds/win.mp3')
+      );
+
+    await sound.playAsync();
+  };
 
   const handleCardPress = (index: number) => {
+
     if (
       flipped.includes(index) ||
       matched.includes(index)
@@ -102,14 +141,24 @@ if (difficulty === 'easy') {
     setFlipped(newFlipped);
 
     if (newFlipped.length === 2) {
+
       const firstCard =
         cards[newFlipped[0]];
 
       const secondCard =
         cards[newFlipped[1]];
 
-      if (firstCard === secondCard) {
-        setScore(score + 1);
+      if (
+        firstCard.image ===
+        secondCard.image
+      ) {
+
+        playCorrectSound();
+
+        const newScore =
+          score + 1;
+
+        setScore(newScore);
 
         const newMatched = [
           ...matched,
@@ -118,26 +167,41 @@ if (difficulty === 'easy') {
 
         setMatched(newMatched);
 
-        if (newMatched.length === cards.length) {
+        if (
+          newMatched.length ===
+          cards.length
+        ) {
 
-        setWon(true);
+          setWon(true);
+
+          playWinSound();
 
           if (difficulty === 'easy') {
-        setStars(1);
-         }
-        else if (difficulty === 'medium') {
-        setStars(2);
-        }
-      else {
-       setStars(3);
-        }
 
-      }
+            setStars(1);
+
+          } else if (
+            difficulty === 'medium'
+          ) {
+
+            setStars(2);
+
+          } else {
+
+            setStars(3);
+          }
+        }
 
         setFlipped([]);
+
       } else {
+
+        playWrongSound();
+
         setTimeout(() => {
+
           setFlipped([]);
+
         }, 1000);
       }
     }
@@ -149,84 +213,94 @@ if (difficulty === 'easy') {
         flex: 1,
         alignItems: 'center',
         backgroundColor: '#FFF8E1',
-        paddingTop: 50,
+        paddingTop: 30,
       }}
     >
+
       <Text
         style={{
           fontSize: 32,
           fontWeight: 'bold',
-          marginBottom: 20,
+          marginBottom: 15,
         }}
       >
         🧩 Memory Game
       </Text>
 
+      {/* Difficulty Buttons */}
+
       <View
-  style={{
-    flexDirection: 'row',
-    marginBottom: 20,
-  }}
->
+        style={{
+          flexDirection: 'row',
+          marginBottom: 15,
+        }}
+      >
 
-  <TouchableOpacity
-    onPress={() => {
-      resetGame();
-      setDifficulty('easy');
-    }}
-    style={{
-      backgroundColor: '#4CAF50',
-      padding: 10,
-      margin: 5,
-      borderRadius: 10,
-    }}
-  >
-    <Text style={{ color: 'white' }}>
-      Easy
-    </Text>
-  </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            resetGame();
+            setDifficulty('easy');
+          }}
+          style={{
+            backgroundColor: '#4CAF50',
+            padding: 10,
+            margin: 5,
+            borderRadius: 10,
+          }}
+        >
+          <Text
+            style={{
+              color: 'white',
+            }}
+          >
+            Easy
+          </Text>
+        </TouchableOpacity>
 
-  <TouchableOpacity
-    onPress={() => {
-      resetGame();
-      setDifficulty('medium');
-    }}
-    style={{
-      backgroundColor: '#FFC107',
-      padding: 10,
-      margin: 5,
-      borderRadius: 10,
-    }}
-  >
-    <Text>
-      Medium
-    </Text>
-  </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            resetGame();
+            setDifficulty('medium');
+          }}
+          style={{
+            backgroundColor: '#FFC107',
+            padding: 10,
+            margin: 5,
+            borderRadius: 10,
+          }}
+        >
+          <Text>
+            Medium
+          </Text>
+        </TouchableOpacity>
 
-  <TouchableOpacity
-    onPress={() => {
-      resetGame();
-      setDifficulty('hard');
-    }}
-    style={{
-      backgroundColor: '#F44336',
-      padding: 10,
-      margin: 5,
-      borderRadius: 10,
-    }}
-  >
-    <Text style={{ color: 'white' }}>
-      Hard
-    </Text>
-  </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            resetGame();
+            setDifficulty('hard');
+          }}
+          style={{
+            backgroundColor: '#F44336',
+            padding: 10,
+            margin: 5,
+            borderRadius: 10,
+          }}
+        >
+          <Text
+            style={{
+              color: 'white',
+            }}
+          >
+            Hard
+          </Text>
+        </TouchableOpacity>
 
-</View>
-
+      </View>
 
       <Text
         style={{
           fontSize: 22,
-          marginBottom: 20,
+          marginBottom: 10,
         }}
       >
         🏆 Score: {score}
@@ -239,6 +313,7 @@ if (difficulty === 'easy') {
             marginBottom: 20,
           }}
         >
+
           <Text
             style={{
               fontSize: 30,
@@ -256,15 +331,16 @@ if (difficulty === 'easy') {
             }}
           >
             Final Score: {score}
-              <Text
-                style={{
-                fontSize: 40,
-                marginTop: 10,
-                }}
-                  >
-                {'⭐'.repeat(stars)}
-              </Text>
-            </Text>
+          </Text>
+
+          <Text
+            style={{
+              fontSize: 40,
+              marginTop: 10,
+            }}
+          >
+            {'⭐'.repeat(stars)}
+          </Text>
 
           <TouchableOpacity
             onPress={restartGame}
@@ -284,58 +360,81 @@ if (difficulty === 'easy') {
               🔄 Play Again
             </Text>
           </TouchableOpacity>
+
         </View>
       )}
 
-        <ScrollView
-            style={{
-            maxHeight: '60%'
-            }}
-        >            
- 
-      <View
+      <ScrollView
         style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          width: 320,
-          justifyContent: 'center',
+          maxHeight: '60%',
         }}
       >
-        {cards.map((card, index) => (
-          <TouchableOpacity
-            key={index}
-            onPress={() => handleCardPress(index)}
-            style={{
-              width: 80,
-              height: 80,
-              backgroundColor: '#4FC3F7',
-              margin: 5,
-              justifyContent: 'center',
-              alignItems: 'center',
-              borderRadius: 10,
-            }}
-          >
-            <Text
+
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            width: 320,
+            justifyContent: 'center',
+          }}
+        >
+
+          {cards.map((card, index) => (
+
+            <TouchableOpacity
+              key={index}
+              onPress={() =>
+                handleCardPress(index)
+              }
               style={{
-                fontSize: 30,
+                width: 80,
+                height: 80,
+                backgroundColor: '#4FC3F7',
+                margin: 5,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderRadius: 10,
               }}
             >
+
               {flipped.includes(index) ||
-              matched.includes(index)
-                ? card
-                : '❓'}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-        </ScrollView>
+              matched.includes(index) ? (
+
+                <Image
+                  source={card.image}
+                  style={{
+                    width: 60,
+                    height: 60,
+                    resizeMode: 'contain',
+                  }}
+                />
+
+              ) : (
+
+                <Text
+                  style={{
+                    fontSize: 30,
+                  }}
+                >
+                  ❓
+                </Text>
+
+              )}
+
+            </TouchableOpacity>
+
+          ))}
+
+        </View>
+
+      </ScrollView>
 
       <TouchableOpacity
         onPress={() => setMode(null)}
       >
         <Text
           style={{
-            marginTop: 30,
+            marginTop: 20,
             fontSize: 20,
             color: 'blue',
           }}
@@ -343,6 +442,7 @@ if (difficulty === 'easy') {
           ⬅ Back
         </Text>
       </TouchableOpacity>
+
     </View>
   );
 }
