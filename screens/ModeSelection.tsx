@@ -1,5 +1,6 @@
 import { Text, TouchableOpacity, View } from 'react-native';
 
+
 export default function ModeSelection({
   setMode,
   selectedProfile,

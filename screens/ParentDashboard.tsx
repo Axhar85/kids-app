@@ -1,8 +1,51 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
 export default function ParentDashboard({
   setShowDashboard,
 }: any) {
+
+  const [aliScore, setAliScore] = useState(0);
+  const [aliLevel, setAliLevel] = useState(1);
+
+  const [saraScore, setSaraScore] = useState(0);
+  const [saraLevel, setSaraLevel] = useState(1);
+
+  const loadStats = async () => {
+
+    const aliScoreSaved =
+      await AsyncStorage.getItem('score_Ali');
+
+    const aliLevelSaved =
+      await AsyncStorage.getItem('level_Ali');
+
+    const saraScoreSaved =
+      await AsyncStorage.getItem('score_Sara');
+
+    const saraLevelSaved =
+      await AsyncStorage.getItem('level_Sara');
+
+    if (aliScoreSaved) {
+      setAliScore(JSON.parse(aliScoreSaved));
+    }
+
+    if (aliLevelSaved) {
+      setAliLevel(JSON.parse(aliLevelSaved));
+    }
+
+    if (saraScoreSaved) {
+      setSaraScore(JSON.parse(saraScoreSaved));
+    }
+
+    if (saraLevelSaved) {
+      setSaraLevel(JSON.parse(saraLevelSaved));
+    }
+  };
+
+  useEffect(() => {
+    loadStats();
+  }, []);
 
   return (
     <View
@@ -25,11 +68,44 @@ export default function ParentDashboard({
 
       <Text
         style={{
-          fontSize: 20,
+          fontSize: 22,
           marginBottom: 10,
         }}
       >
-        Statistics Coming Soon...
+        👦 Ali
+      </Text>
+
+      <Text>
+        Animal Score: {aliScore}
+      </Text>
+
+      <Text
+        style={{
+          marginBottom: 20,
+        }}
+      >
+        Animal Level: {aliLevel}
+      </Text>
+
+      <Text
+        style={{
+          fontSize: 22,
+          marginBottom: 10,
+        }}
+      >
+        👧 Sara
+      </Text>
+
+      <Text>
+        Animal Score: {saraScore}
+      </Text>
+
+      <Text
+        style={{
+          marginBottom: 20,
+        }}
+      >
+        Animal Level: {saraLevel}
       </Text>
 
       <TouchableOpacity
