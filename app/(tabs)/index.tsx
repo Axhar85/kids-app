@@ -6,6 +6,7 @@ import BadgesScreen from '../../screens/BadgesScreen';
 import BigKidsGame from '../../screens/BigKidsGame';
 import MemoryGame from '../../screens/MemoryGame';
 import ModeSelection from '../../screens/ModeSelection';
+import ParentDashboard from '../../screens/ParentDashboard';
 import ProfileSelection from '../../screens/ProfileSelection';
 import ToddlerGame from '../../screens/ToddlerGame';
 
@@ -14,6 +15,7 @@ export default function HomeScreen() {
   const [name, setName] = useState('');
   const [language, setLanguage] = useState('en');
   const [mode, setMode] = useState<string | null>(null);
+  const [showDashboard, setShowDashboard] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
   const [showBadges, setShowBadges] = useState(false);
   
@@ -63,6 +65,16 @@ export default function HomeScreen() {
     Speech.speak(text);
   };
 
+    if (showDashboard) {
+
+    return (
+      <ParentDashboard
+        setShowDashboard={
+          setShowDashboard
+        }
+      />
+    );
+  }
   if (!selectedProfile) {
   return (
     <ProfileSelection
@@ -78,6 +90,7 @@ export default function HomeScreen() {
     <ModeSelection
       setMode={setMode}
       selectedProfile={selectedProfile}
+        setShowDashboard={setShowDashboard}
     />
   );
 }

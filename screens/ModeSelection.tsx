@@ -3,9 +3,11 @@ import { Text, TouchableOpacity, View } from 'react-native';
 export default function ModeSelection({
   setMode,
   selectedProfile,
+  setShowDashboard,
 }: {
   setMode: (mode: string) => void;
   selectedProfile: string;
+  setShowDashboard: (show: boolean) => void;
 }) {
   return (
     <View
@@ -98,6 +100,29 @@ export default function ModeSelection({
         🧩 Memory Game
     </Text>
     </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => setShowDashboard(true)}
+        style={{
+          backgroundColor: '#009688',
+          paddingVertical: 15,
+          paddingHorizontal: 30,
+          borderRadius: 20,
+          width: 220,
+          alignItems: 'center',
+          marginTop: 15,
+        }}
+      >
+        <Text
+          style={{
+            color: 'white',
+            fontSize: 20,
+          }}
+        >
+          👨 Dashboard
+        </Text>
+      </TouchableOpacity>
+          
     </View>
   );
 }
