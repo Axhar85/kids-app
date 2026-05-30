@@ -4,8 +4,14 @@ export default function ProfileSelection({
   setSelectedProfile,
 }: any) {
   const profiles = [
-    { name: 'Ali', emoji: '👦' },
-    { name: 'Sara', emoji: '👧' },
+    {
+    name: 'Ali',
+    avatar: '🦸'
+  },
+  {
+    name: 'Sara',
+    avatar: '👸'
+  },
   ];
 
   return (
@@ -28,29 +34,32 @@ export default function ProfileSelection({
       </Text>
 
       {profiles.map((profile) => (
-        <TouchableOpacity
-          key={profile.name}
-          onPress={() => setSelectedProfile(profile.name)}
+
+      <TouchableOpacity
+        key={profile.name}
+        onPress={() =>
+          setSelectedProfile(profile.name)
+        }
+        style={{
+          backgroundColor: '#4CAF50',
+          padding: 20,
+          borderRadius: 20,
+          marginBottom: 15,
+          width: 250,
+          alignItems: 'center',
+        }}
+      >
+        <Text
           style={{
-            backgroundColor: '#4CAF50',
-            paddingVertical: 15,
-            paddingHorizontal: 30,
-            borderRadius: 20,
-            marginBottom: 15,
-            width: 220,
-            alignItems: 'center',
+            color: 'white',
+            fontSize: 28,
           }}
         >
-          <Text
-            style={{
-              color: 'white',
-              fontSize: 22,
-            }}
-          >
-            {profile.emoji} {profile.name}
-          </Text>
-        </TouchableOpacity>
-      ))}
+          {profile.avatar} {profile.name}
+        </Text>
+      </TouchableOpacity>
+
+    ))}
     </View>
   );
 }
