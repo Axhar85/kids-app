@@ -12,6 +12,10 @@ export default function ParentDashboard({
   const [saraScore, setSaraScore] = useState(0);
   const [saraLevel, setSaraLevel] = useState(1);
 
+  const [aliBadge, setAliBadge] = useState('');
+  const [saraBadge, setSaraBadge] = useState('');
+  
+
   const loadStats = async () => {
 
     const aliScoreSaved =
@@ -25,6 +29,12 @@ export default function ParentDashboard({
 
     const saraLevelSaved =
       await AsyncStorage.getItem('level_Sara');
+
+    const aliBadgeSaved =
+      await AsyncStorage.getItem('badge_Ali');
+
+    const saraBadgeSaved = 
+        await AsyncStorage.getItem('badge_Sara');
 
     if (aliScoreSaved) {
       setAliScore(JSON.parse(aliScoreSaved));
@@ -41,11 +51,19 @@ export default function ParentDashboard({
     if (saraLevelSaved) {
       setSaraLevel(JSON.parse(saraLevelSaved));
     }
+
+    if (aliBadgeSaved) {
+        setAliBadge( JSON.parse(aliBadgeSaved) );
+        }
+
+        if (saraBadgeSaved) {
+        setSaraBadge(JSON.parse(saraBadgeSaved) );
+        }
   };
 
-  useEffect(() => {
-    loadStats();
-  }, []);
+        useEffect(() => {
+            loadStats();
+        }, []);
 
   return (
     <View
@@ -85,8 +103,15 @@ export default function ParentDashboard({
         }}
       >
         Animal Level: {aliLevel}
-      </Text>
 
+
+      </Text>
+         <Text style={{
+            marginBottom: 20,
+        }}
+        >
+        Achievement: {aliBadge || 'None'}
+        </Text>
       <Text
         style={{
           fontSize: 22,
@@ -106,8 +131,15 @@ export default function ParentDashboard({
         }}
       >
         Animal Level: {saraLevel}
-      </Text>
 
+      </Text>
+                <Text
+            style={{
+                marginBottom: 20,
+            }}
+            >
+            Achievement: {saraBadge || 'None'}
+            </Text>
       <TouchableOpacity
         onPress={() =>
           setShowDashboard(false)

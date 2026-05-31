@@ -60,6 +60,25 @@ export default function useToddlerGame(selectedProfile: string | null) {
   };
 
 
+    const saveBadge = async (
+      newBadge: string
+    ) => {
+
+      try {
+
+        if (!selectedProfile) return;
+
+        await AsyncStorage.setItem(
+          `badge_${selectedProfile}`,
+          JSON.stringify(newBadge)
+        );
+
+      } catch (error) {
+
+        console.log('Badge save error', error);
+      }
+    };
+
   // Badge
   const checkBadge = (newScore: number) => {
 
@@ -79,6 +98,8 @@ export default function useToddlerGame(selectedProfile: string | null) {
 
     setBadge(newBadge);
 
+    saveBadge(newBadge);
+
     setShowBadgePopup(true);
 
     setTimeout(() => {
@@ -87,6 +108,26 @@ export default function useToddlerGame(selectedProfile: string | null) {
 
   }
 };
+    const checkAchievements = (newLevel: number) => {
+
+    if (newLevel === 2) {
+
+      setBadge('🥉 Animal Explorer');
+
+    } else if (newLevel === 5) {
+
+      setBadge('🥈 Animal Expert');
+
+    } else if (newLevel === 10) {
+
+      setBadge('🥇 Animal Master');
+
+    }
+
+  };
+
+
+
   // HANDLE PRESS
   const handleAnimalPress = (animal: any) => {
 
@@ -123,8 +164,9 @@ export default function useToddlerGame(selectedProfile: string | null) {
     saveProgress(newScore, level + 1);
 
     Speech.speak('Level Up!');
+    
   }
-
+   checkAchievements(level + 1);
 }
  else {
 
