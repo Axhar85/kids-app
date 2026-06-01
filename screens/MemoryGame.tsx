@@ -227,8 +227,6 @@ export default function MemoryGame({
         🧩 Memory Game
       </Text>
 
-      {/* Difficulty Buttons */}
-
       <View
         style={{
           flexDirection: 'row',

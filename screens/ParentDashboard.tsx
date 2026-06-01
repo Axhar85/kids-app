@@ -1,6 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import {
+    Text,
+    TouchableOpacity,
+    View,
+} from 'react-native';
 
 export default function ParentDashboard({
   setShowDashboard,
@@ -8,62 +12,112 @@ export default function ParentDashboard({
 
   const [aliScore, setAliScore] = useState(0);
   const [aliLevel, setAliLevel] = useState(1);
+  const [aliBadge, setAliBadge] = useState('');
+  const [aliMemoryBadge, setAliMemoryBadge] = useState('');
 
   const [saraScore, setSaraScore] = useState(0);
   const [saraLevel, setSaraLevel] = useState(1);
-
-  const [aliBadge, setAliBadge] = useState('');
   const [saraBadge, setSaraBadge] = useState('');
-  
+  const [saraMemoryBadge, setSaraMemoryBadge] = useState('');
 
   const loadStats = async () => {
 
-    const aliScoreSaved =
-      await AsyncStorage.getItem('score_Ali');
+    try {
 
-    const aliLevelSaved =
-      await AsyncStorage.getItem('level_Ali');
+      const aliScoreSaved =
+        await AsyncStorage.getItem('score_Ali');
 
-    const saraScoreSaved =
-      await AsyncStorage.getItem('score_Sara');
+      const aliLevelSaved =
+        await AsyncStorage.getItem('level_Ali');
 
-    const saraLevelSaved =
-      await AsyncStorage.getItem('level_Sara');
+      const aliBadgeSaved =
+        await AsyncStorage.getItem('badge_Ali');
 
-    const aliBadgeSaved =
-      await AsyncStorage.getItem('badge_Ali');
+      const aliMemoryBadgeSaved =
+        await AsyncStorage.getItem(
+          'memoryBadge_Ali'
+        );
 
-    const saraBadgeSaved = 
+      const saraScoreSaved =
+        await AsyncStorage.getItem('score_Sara');
+
+      const saraLevelSaved =
+        await AsyncStorage.getItem('level_Sara');
+
+      const saraBadgeSaved =
         await AsyncStorage.getItem('badge_Sara');
 
-    if (aliScoreSaved) {
-      setAliScore(JSON.parse(aliScoreSaved));
+      const saraMemoryBadgeSaved =
+        await AsyncStorage.getItem(
+          'memoryBadge_Sara'
+        );
+
+      if (aliScoreSaved) {
+        setAliScore(
+          JSON.parse(aliScoreSaved)
+        );
+      }
+
+      if (aliLevelSaved) {
+        setAliLevel(
+          JSON.parse(aliLevelSaved)
+        );
+      }
+
+      if (aliBadgeSaved) {
+        setAliBadge(
+          JSON.parse(aliBadgeSaved)
+        );
+      }
+
+      if (aliMemoryBadgeSaved) {
+        setAliMemoryBadge(
+          JSON.parse(
+            aliMemoryBadgeSaved
+          )
+        );
+      }
+
+      if (saraScoreSaved) {
+        setSaraScore(
+          JSON.parse(saraScoreSaved)
+        );
+      }
+
+      if (saraLevelSaved) {
+        setSaraLevel(
+          JSON.parse(saraLevelSaved)
+        );
+      }
+
+      if (saraBadgeSaved) {
+        setSaraBadge(
+          JSON.parse(saraBadgeSaved)
+        );
+      }
+
+      if (saraMemoryBadgeSaved) {
+        setSaraMemoryBadge(
+          JSON.parse(
+            saraMemoryBadgeSaved
+          )
+        );
+      }
+
+    } catch (error) {
+
+      console.log(
+        'Dashboard load error',
+        error
+      );
+
     }
 
-    if (aliLevelSaved) {
-      setAliLevel(JSON.parse(aliLevelSaved));
-    }
-
-    if (saraScoreSaved) {
-      setSaraScore(JSON.parse(saraScoreSaved));
-    }
-
-    if (saraLevelSaved) {
-      setSaraLevel(JSON.parse(saraLevelSaved));
-    }
-
-    if (aliBadgeSaved) {
-        setAliBadge( JSON.parse(aliBadgeSaved) );
-        }
-
-        if (saraBadgeSaved) {
-        setSaraBadge(JSON.parse(saraBadgeSaved) );
-        }
   };
 
-        useEffect(() => {
-            loadStats();
-        }, []);
+  useEffect(() => {
+    loadStats();
+  }, []);
 
   return (
     <View
@@ -74,6 +128,7 @@ export default function ParentDashboard({
         backgroundColor: '#FFF8E1',
       }}
     >
+
       <Text
         style={{
           fontSize: 32,
@@ -84,17 +139,29 @@ export default function ParentDashboard({
         👨 Parent Dashboard
       </Text>
 
+      {/* ALI */}
+
       <Text
         style={{
           fontSize: 22,
-          marginBottom: 10,
+          fontWeight: 'bold',
         }}
       >
         👦 Ali
       </Text>
 
       <Text>
-        Animal Score: {aliScore}
+        Score: {aliScore}
+      </Text>
+
+      <Text>
+        Level: {aliLevel}
+      </Text>
+
+      <Text>
+        Animal Badge:
+        {' '}
+        {aliBadge || 'None'}
       </Text>
 
       <Text
@@ -102,27 +169,34 @@ export default function ParentDashboard({
           marginBottom: 20,
         }}
       >
-        Animal Level: {aliLevel}
-
-
+        Memory Badge:
+        {' '}
+        {aliMemoryBadge || 'None'}
       </Text>
-         <Text style={{
-            marginBottom: 20,
-        }}
-        >
-        Achievement: {aliBadge || 'None'}
-        </Text>
+
+      {/* SARA */}
+
       <Text
         style={{
           fontSize: 22,
-          marginBottom: 10,
+          fontWeight: 'bold',
         }}
       >
         👧 Sara
       </Text>
 
       <Text>
-        Animal Score: {saraScore}
+        Score: {saraScore}
+      </Text>
+
+      <Text>
+        Level: {saraLevel}
+      </Text>
+
+      <Text>
+        Animal Badge:
+        {' '}
+        {saraBadge || 'None'}
       </Text>
 
       <Text
@@ -130,16 +204,11 @@ export default function ParentDashboard({
           marginBottom: 20,
         }}
       >
-        Animal Level: {saraLevel}
-
+        Memory Badge:
+        {' '}
+        {saraMemoryBadge || 'None'}
       </Text>
-                <Text
-            style={{
-                marginBottom: 20,
-            }}
-            >
-            Achievement: {saraBadge || 'None'}
-            </Text>
+
       <TouchableOpacity
         onPress={() =>
           setShowDashboard(false)
@@ -154,6 +223,7 @@ export default function ParentDashboard({
           ⬅ Back
         </Text>
       </TouchableOpacity>
+
     </View>
   );
 }
