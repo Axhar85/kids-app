@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio } from 'expo-av';
 import { useEffect, useState } from 'react';
 import {
@@ -10,6 +11,7 @@ import {
 
 export default function MemoryGame({
   setMode,
+  selectedProfile,
 }: any) {
 
   const [flipped, setFlipped] = useState<number[]>([]);
@@ -19,6 +21,7 @@ export default function MemoryGame({
   const [won, setWon] = useState(false);
   const [difficulty, setDifficulty] = useState('medium');
   const [stars, setStars] = useState(0);
+  const [memoryAchievement, setMemoryAchievement] =   useState('');
 
   const animalCards = [
     {
@@ -124,6 +127,29 @@ export default function MemoryGame({
     await sound.playAsync();
   };
 
+
+  const saveMemoryAchievement = async (
+  achievement: string
+) => {
+
+  try {
+
+    if (!selectedProfile) return;
+    await AsyncStorage.setItem(
+      `memoryBadge_${selectedProfile}`,
+      JSON.stringify(achievement)
+    );
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+};
+
+
+
   const handleCardPress = (index: number) => {
 
     if (
@@ -170,9 +196,42 @@ export default function MemoryGame({
         if (
           newMatched.length ===
           cards.length
+          
         ) {
 
+          
           setWon(true);
+
+          let achievement = '';
+
+            if (difficulty === 'easy') {
+
+              achievement =
+                '🧠 Memory Beginner';
+
+            }
+            else if (
+              difficulty === 'medium'
+            ) {
+
+              achievement =
+                '🧠 Memory Expert';
+
+            }
+            else {
+
+              achievement =
+                '🧠 Memory Master';
+
+            }
+
+            setMemoryAchievement(
+              achievement
+            );
+
+            saveMemoryAchievement(
+              achievement
+            );
 
           playWinSound();
 
@@ -329,6 +388,16 @@ export default function MemoryGame({
             }}
           >
             Final Score: {score}
+            <Text
+            style={{
+              fontSize: 24,
+              marginTop: 10,
+              color: '#FF9800',
+              fontWeight: 'bold',
+            }}
+          >
+            {memoryAchievement}
+          </Text>
           </Text>
 
           <Text

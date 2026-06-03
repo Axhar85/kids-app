@@ -132,6 +132,7 @@ if (mode === 'memory') {
   return (
     <MemoryGame
       setMode={setMode}
+      selectedProfile={selectedProfile}
     />
   );
 }
