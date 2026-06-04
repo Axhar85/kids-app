@@ -1,219 +1,113 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
-import {
-    Text,
-    TouchableOpacity,
-    View,
-} from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ParentDashboard({
   setShowDashboard,
 }: any) {
-
-  const [aliScore, setAliScore] = useState(0);
-  const [aliLevel, setAliLevel] = useState(1);
-  const [aliBadge, setAliBadge] = useState('');
-  const [aliMemoryBadge, setAliMemoryBadge] = useState('');
-
-  const [saraScore, setSaraScore] = useState(0);
-  const [saraLevel, setSaraLevel] = useState(1);
-  const [saraBadge, setSaraBadge] = useState('');
-  const [saraMemoryBadge, setSaraMemoryBadge] = useState('');
-
-  const loadStats = async () => {
-
-    try {
-
-      const aliScoreSaved =
-        await AsyncStorage.getItem('score_Ali');
-
-      const aliLevelSaved =
-        await AsyncStorage.getItem('level_Ali');
-
-      const aliBadgeSaved =
-        await AsyncStorage.getItem('badge_Ali');
-
-      const aliMemoryBadgeSaved =
-        await AsyncStorage.getItem(
-          'memoryBadge_Ali'
-        );
-
-      const saraScoreSaved =
-        await AsyncStorage.getItem('score_Sara');
-
-      const saraLevelSaved =
-        await AsyncStorage.getItem('level_Sara');
-
-      const saraBadgeSaved =
-        await AsyncStorage.getItem('badge_Sara');
-
-      const saraMemoryBadgeSaved =
-        await AsyncStorage.getItem(
-          'memoryBadge_Sara'
-        );
-
-      if (aliScoreSaved) {
-        setAliScore(
-          JSON.parse(aliScoreSaved)
-        );
-      }
-
-      if (aliLevelSaved) {
-        setAliLevel(
-          JSON.parse(aliLevelSaved)
-        );
-      }
-
-      if (aliBadgeSaved) {
-        setAliBadge(
-          JSON.parse(aliBadgeSaved)
-        );
-      }
-
-      if (aliMemoryBadgeSaved) {
-        setAliMemoryBadge(
-          JSON.parse(
-            aliMemoryBadgeSaved
-          )
-        );
-      }
-
-      if (saraScoreSaved) {
-        setSaraScore(
-          JSON.parse(saraScoreSaved)
-        );
-      }
-
-      if (saraLevelSaved) {
-        setSaraLevel(
-          JSON.parse(saraLevelSaved)
-        );
-      }
-
-      if (saraBadgeSaved) {
-        setSaraBadge(
-          JSON.parse(saraBadgeSaved)
-        );
-      }
-
-      if (saraMemoryBadgeSaved) {
-        setSaraMemoryBadge(
-          JSON.parse(
-            saraMemoryBadgeSaved
-          )
-        );
-      }
-
-    } catch (error) {
-
-      console.log(
-        'Dashboard load error',
-        error
-      );
-
-    }
-
-  };
+  const [profilesStats, setProfilesStats] = useState<any[]>([]);
 
   useEffect(() => {
     loadStats();
   }, []);
 
+  const loadStats = async () => {
+    const savedProfiles = await AsyncStorage.getItem('profiles');
+
+    if (!savedProfiles) {
+      setProfilesStats([]);
+      return;
+    }
+
+    const profiles = JSON.parse(savedProfiles);
+
+    const stats = await Promise.all(
+      profiles.map(async (profile: any) => {
+        const scoreSaved = await AsyncStorage.getItem(
+          `score_${profile.name}`
+        );
+
+        const levelSaved = await AsyncStorage.getItem(
+          `level_${profile.name}`
+        );
+
+        const animalBadgeSaved = await AsyncStorage.getItem(
+          `badge_${profile.name}`
+        );
+
+        const memoryBadgeSaved = await AsyncStorage.getItem(
+          `memoryBadge_${profile.name}`
+        );
+
+        return {
+          name: profile.name,
+          avatar: profile.avatar,
+          score: scoreSaved ? JSON.parse(scoreSaved) : 0,
+          level: levelSaved ? JSON.parse(levelSaved) : 1,
+          animalBadge: animalBadgeSaved
+            ? JSON.parse(animalBadgeSaved)
+            : 'None',
+          memoryBadge: memoryBadgeSaved
+            ? JSON.parse(memoryBadgeSaved)
+            : 'None',
+        };
+      })
+    );
+
+    setProfilesStats(stats);
+  };
+
   return (
-    <View
-      style={{
-        flex: 1,
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#FFF8E1',
+        paddingVertical: 40,
       }}
     >
-
       <Text
         style={{
           fontSize: 32,
           fontWeight: 'bold',
-          marginBottom: 20,
+          marginBottom: 30,
         }}
       >
         👨 Parent Dashboard
       </Text>
 
-      {/* ALI */}
+      {profilesStats.length === 0 && (
+        <Text style={{ fontSize: 20, marginBottom: 20 }}>
+          No profiles found.
+        </Text>
+      )}
 
-      <Text
-        style={{
-          fontSize: 22,
-          fontWeight: 'bold',
-        }}
-      >
-        👦 Ali
-      </Text>
+      {profilesStats.map((profile) => (
+        <View
+          key={profile.name}
+          style={{
+            alignItems: 'center',
+            marginBottom: 30,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 28,
+              fontWeight: 'bold',
+            }}
+          >
+            {profile.avatar} {profile.name}
+          </Text>
 
-      <Text>
-        Score: {aliScore}
-      </Text>
+          <Text>Score: {profile.score}</Text>
+          <Text>Level: {profile.level}</Text>
+          <Text>Animal Badge: {profile.animalBadge}</Text>
+          <Text>Memory Badge: {profile.memoryBadge}</Text>
+        </View>
+      ))}
 
-      <Text>
-        Level: {aliLevel}
-      </Text>
-
-      <Text>
-        Animal Badge:
-        {' '}
-        {aliBadge || 'None'}
-      </Text>
-
-      <Text
-        style={{
-          marginBottom: 20,
-        }}
-      >
-        Memory Badge:
-        {' '}
-        {aliMemoryBadge || 'None'}
-      </Text>
-
-      {/* SARA */}
-
-      <Text
-        style={{
-          fontSize: 22,
-          fontWeight: 'bold',
-        }}
-      >
-        👧 Sara
-      </Text>
-
-      <Text>
-        Score: {saraScore}
-      </Text>
-
-      <Text>
-        Level: {saraLevel}
-      </Text>
-
-      <Text>
-        Animal Badge:
-        {' '}
-        {saraBadge || 'None'}
-      </Text>
-
-      <Text
-        style={{
-          marginBottom: 20,
-        }}
-      >
-        Memory Badge:
-        {' '}
-        {saraMemoryBadge || 'None'}
-      </Text>
-
-      <TouchableOpacity
-        onPress={() =>
-          setShowDashboard(false)
-        }
-      >
+      <TouchableOpacity onPress={() => setShowDashboard(false)}>
         <Text
           style={{
             color: 'blue',
@@ -223,7 +117,6 @@ export default function ParentDashboard({
           ⬅ Back
         </Text>
       </TouchableOpacity>
-
-    </View>
+    </ScrollView>
   );
 }

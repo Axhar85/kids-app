@@ -1,6 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
-import { Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function ProfileSelection({
   setSelectedProfile,
@@ -8,6 +14,7 @@ export default function ProfileSelection({
   const [profiles, setProfiles] = useState<any[]>([]);
   const [newName, setNewName] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('👦');
+  const [editingAvatarFor, setEditingAvatarFor] = useState<string | null>(null);
 
   const avatars = ['👦', '👧', '🦸', '👸', '🦁', '🚀', '🐶', '🐱'];
 
@@ -27,7 +34,11 @@ export default function ProfileSelection({
       ];
 
       setProfiles(defaultProfiles);
-      await AsyncStorage.setItem('profiles', JSON.stringify(defaultProfiles));
+
+      await AsyncStorage.setItem(
+        'profiles',
+        JSON.stringify(defaultProfiles)
+      );
     }
   };
 
@@ -39,7 +50,10 @@ export default function ProfileSelection({
       avatar: selectedAvatar,
     };
 
-    const updatedProfiles = [...profiles, newProfile];
+    const updatedProfiles = [
+      ...profiles,
+      newProfile,
+    ];
 
     setProfiles(updatedProfiles);
 
@@ -52,25 +66,38 @@ export default function ProfileSelection({
     setSelectedAvatar('👦');
   };
 
-  const deleteProfile = async (
-      profileName: string
-    ) => {
+  const deleteProfile = async (profileName: string) => {
+    const confirmed = confirm(
+      `Are you sure you want to delete ${profileName}? This will remove their progress.`
+    );
 
-      const updatedProfiles =
-        profiles.filter(
-          (profile) =>
-            profile.name !== profileName
-        );
+    if (!confirmed) return;
 
-      setProfiles(updatedProfiles);
+    const updatedProfiles = profiles.filter(
+      (profile) => profile.name !== profileName
+    );
 
-      await AsyncStorage.setItem(
-        'profiles',
-        JSON.stringify(updatedProfiles)
-      );
-    };
+    setProfiles(updatedProfiles);
 
-    const renameProfile = async (oldName: string) => {
+    await AsyncStorage.setItem(
+      'profiles',
+      JSON.stringify(updatedProfiles)
+    );
+
+    const keys = [
+      'score',
+      'level',
+      'badge',
+      'memoryBadge',
+      'gamesPlayed',
+    ];
+
+    for (const key of keys) {
+      await AsyncStorage.removeItem(`${key}_${profileName}`);
+    }
+  };
+
+  const renameProfile = async (oldName: string) => {
     const newName = prompt('Enter new name');
 
     if (!newName || !newName.trim()) return;
@@ -90,28 +117,55 @@ export default function ProfileSelection({
       JSON.stringify(updatedProfiles)
     );
 
-      const keys = [
-        'score',
-        'level',
-        'badge',
-        'memoryBadge',
-        'gamesPlayed',
-      ];
+    const keys = [
+      'score',
+      'level',
+      'badge',
+      'memoryBadge',
+      'gamesPlayed',
+    ];
 
     for (const key of keys) {
-      const oldValue = await AsyncStorage.getItem(`${key}_${oldName}`);
+      const oldValue =
+        await AsyncStorage.getItem(`${key}_${oldName}`);
 
       if (oldValue !== null) {
-        await AsyncStorage.setItem(`${key}_${cleanName}`, oldValue);
-        await AsyncStorage.removeItem(`${key}_${oldName}`);
+        await AsyncStorage.setItem(
+          `${key}_${cleanName}`,
+          oldValue
+        );
+
+        await AsyncStorage.removeItem(
+          `${key}_${oldName}`
+        );
       }
     }
   };
 
+  const changeAvatar = async (
+    profileName: string,
+    newAvatar: string
+  ) => {
+    const updatedProfiles = profiles.map((profile) =>
+      profile.name === profileName
+        ? { ...profile, avatar: newAvatar }
+        : profile
+    );
+
+    setProfiles(updatedProfiles);
+
+    await AsyncStorage.setItem(
+      'profiles',
+      JSON.stringify(updatedProfiles)
+    );
+
+    setEditingAvatarFor(null);
+  };
+
   return (
-    <View
-      style={{
-        flex: 1,
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#FFF8E1',
@@ -130,73 +184,138 @@ export default function ProfileSelection({
 
       {profiles.map((profile) => (
         <View
-        key={profile.name}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginBottom: 10,
-        }}
-      >
+          key={profile.name}
+          style={{
+            alignItems: 'center',
+            marginBottom: 15,
+          }}
+        >
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}
+          >
+            <TouchableOpacity
+              onPress={() =>
+                setSelectedProfile(profile.name)
+              }
+              style={{
+                backgroundColor: '#4CAF50',
+                padding: 15,
+                borderRadius: 20,
+                width: 190,
+                alignItems: 'center',
+              }}
+            >
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 24,
+                }}
+              >
+                {profile.avatar} {profile.name}
+              </Text>
+            </TouchableOpacity>
 
-    <TouchableOpacity
-      onPress={() =>
-        setSelectedProfile(profile.name)
-      }
-      style={{
-        backgroundColor: '#4CAF50',
-        padding: 15,
-        borderRadius: 20,
-        width: 190,
-        alignItems: 'center',
-      }}
-    >
-      <Text
-        style={{
-          color: 'white',
-          fontSize: 24,
-        }}
-      >
-        {profile.avatar} {profile.name}
-      </Text>
-    </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                setEditingAvatarFor(
+                  editingAvatarFor === profile.name
+                    ? null
+                    : profile.name
+                )
+              }
+              style={{
+                backgroundColor: '#9C27B0',
+                marginLeft: 10,
+                padding: 15,
+                borderRadius: 15,
+              }}
+            >
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 20,
+                }}
+              >
+                🎨
+              </Text>
+            </TouchableOpacity>
 
-    <TouchableOpacity
-      onPress={() =>
-        deleteProfile(profile.name)
-      }
-      style={{
-        backgroundColor: '#F44336',
-        marginLeft: 10,
-        padding: 15,
-        borderRadius: 15,
-      }}
-    >
-      <Text
-        style={{
-          color: 'white',
-          fontSize: 20,
-        }}
-      >
-        ❌
-      </Text>
-    </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                renameProfile(profile.name)
+              }
+              style={{
+                backgroundColor: '#FFC107',
+                marginLeft: 10,
+                padding: 15,
+                borderRadius: 15,
+              }}
+            >
+              <Text style={{ fontSize: 20 }}>
+                ✏️
+              </Text>
+            </TouchableOpacity>
 
-    <TouchableOpacity
-      onPress={() => renameProfile(profile.name)}
-      style={{
-        backgroundColor: '#FFC107',
-        marginLeft: 10,
-        padding: 15,
-        borderRadius: 15,
-      }}
-    >
-      <Text style={{ fontSize: 20 }}>
-        ✏️
-      </Text>
-    </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() =>
+                deleteProfile(profile.name)
+              }
+              style={{
+                backgroundColor: '#F44336',
+                marginLeft: 10,
+                padding: 15,
+                borderRadius: 15,
+              }}
+            >
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 20,
+                }}
+              >
+                ❌
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-  </View>
-        ))}
+          {editingAvatarFor === profile.name && (
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                width: 260,
+                marginTop: 10,
+              }}
+            >
+              {avatars.map((avatar) => (
+                <TouchableOpacity
+                  key={avatar}
+                  onPress={() =>
+                    changeAvatar(profile.name, avatar)
+                  }
+                  style={{
+                    padding: 8,
+                    margin: 4,
+                    borderRadius: 10,
+                    backgroundColor:
+                      profile.avatar === avatar
+                        ? '#FFC107'
+                        : '#E0E0E0',
+                  }}
+                >
+                  <Text style={{ fontSize: 24 }}>
+                    {avatar}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </View>
+      ))}
 
       <Text
         style={{
@@ -241,10 +360,14 @@ export default function ProfileSelection({
               margin: 5,
               borderRadius: 10,
               backgroundColor:
-                selectedAvatar === avatar ? '#FFC107' : '#E0E0E0',
+                selectedAvatar === avatar
+                  ? '#FFC107'
+                  : '#E0E0E0',
             }}
           >
-            <Text style={{ fontSize: 28 }}>{avatar}</Text>
+            <Text style={{ fontSize: 28 }}>
+              {avatar}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -258,10 +381,15 @@ export default function ProfileSelection({
           borderRadius: 20,
         }}
       >
-        <Text style={{ color: 'white', fontSize: 18 }}>
+        <Text
+          style={{
+            color: 'white',
+            fontSize: 18,
+          }}
+        >
           Save Kid
         </Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
