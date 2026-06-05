@@ -39,6 +39,10 @@ export default function ParentDashboard({
           `memoryBadge_${profile.name}`
         );
 
+        const memoryWinsSaved = await AsyncStorage.getItem(
+          `memoryWins_${profile.name}`
+        );
+
         return {
           name: profile.name,
           avatar: profile.avatar,
@@ -50,6 +54,9 @@ export default function ParentDashboard({
           memoryBadge: memoryBadgeSaved
             ? JSON.parse(memoryBadgeSaved)
             : 'None',
+            memoryWins: memoryWinsSaved
+            ? JSON.parse(memoryWinsSaved)
+            : 0,
         };
       })
     );
@@ -83,29 +90,33 @@ export default function ParentDashboard({
         </Text>
       )}
 
-      {profilesStats.map((profile) => (
-        <View
-          key={profile.name}
-          style={{
-            alignItems: 'center',
-            marginBottom: 30,
-          }}
-        >
-          <Text
+      {profilesStats.map((profile) => {
+        const totalAchievements = [
+          profile.animalBadge,
+          profile.memoryBadge,
+        ].filter((badge) => badge !== 'None').length;
+
+        return (
+          <View
+            key={profile.name}
             style={{
-              fontSize: 28,
-              fontWeight: 'bold',
+              alignItems: 'center',
+              marginBottom: 30,
             }}
           >
-            {profile.avatar} {profile.name}
-          </Text>
+            <Text style={{ fontSize: 28, fontWeight: 'bold' }}>
+              {profile.avatar} {profile.name}
+            </Text>
 
-          <Text>Score: {profile.score}</Text>
-          <Text>Level: {profile.level}</Text>
-          <Text>Animal Badge: {profile.animalBadge}</Text>
-          <Text>Memory Badge: {profile.memoryBadge}</Text>
-        </View>
-      ))}
+            <Text>Score: {profile.score}</Text>
+            <Text>Level: {profile.level}</Text>
+            <Text>Animal Badge: {profile.animalBadge}</Text>
+            <Text>Memory Badge: {profile.memoryBadge}</Text>
+            <Text>Memory Wins: {profile.memoryWins}</Text>
+            <Text>Achievements: {totalAchievements}</Text>
+          </View>
+        );
+      })}
 
       <TouchableOpacity onPress={() => setShowDashboard(false)}>
         <Text

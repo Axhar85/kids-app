@@ -97,6 +97,29 @@ export default function MemoryGame({
     shuffleCards();
   };
 
+
+    const saveMemoryWin = async () => {
+
+      if (!selectedProfile) return;
+
+      const savedWins =
+        await AsyncStorage.getItem(
+          `memoryWins_${selectedProfile}`
+        );
+
+      const wins =
+        savedWins
+          ? JSON.parse(savedWins)
+          : 0;
+
+      await AsyncStorage.setItem(
+        `memoryWins_${selectedProfile}`,
+        JSON.stringify(wins + 1)
+      );
+    };
+
+
+
   const playCorrectSound = async () => {
 
     const { sound } =
@@ -201,6 +224,7 @@ export default function MemoryGame({
 
           
           setWon(true);
+          saveMemoryWin();
 
           let achievement = '';
 
