@@ -8,6 +8,7 @@ import MemoryGame from '../../screens/MemoryGame';
 import ModeSelection from '../../screens/ModeSelection';
 import ParentDashboard from '../../screens/ParentDashboard';
 import ProfileSelection from '../../screens/ProfileSelection';
+import QuizGame from '../../screens/QuizGame';
 import ToddlerGame from '../../screens/ToddlerGame';
 
 
@@ -137,6 +138,12 @@ if (mode === 'memory') {
     />
   );
 }
+
+    if (mode === 'quiz') {
+    return <QuizGame setMode={setMode} />;
+  }
+
+
   if (mode === 'big') {
   return (
     <BigKidsGame
