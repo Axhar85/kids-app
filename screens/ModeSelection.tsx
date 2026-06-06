@@ -5,10 +5,12 @@ export default function ModeSelection({
   setMode,
   selectedProfile,
   setShowDashboard,
+  level,
 }: {
   setMode: (mode: string) => void;
   selectedProfile: string;
   setShowDashboard: (show: boolean) => void;
+  level: number;
 }) {
   return (
     <View
@@ -81,26 +83,25 @@ export default function ModeSelection({
         </Text>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => setMode('memory')}
-        style={{
-        backgroundColor: '#009688',
-        paddingVertical: 15,
-        paddingHorizontal: 30,
-        borderRadius: 20,
-        width: 220,
-        alignItems: 'center',
-        marginTop: 15,
+        onPress={() => {
+          if (level >= 2) {
+            setMode('memory');
+          }
         }}
-    >
-    <Text
         style={{
-        color: 'white',
-        fontSize: 20,
+          backgroundColor: level >= 2 ? '#009688' : '#9E9E9E',
+          paddingVertical: 15,
+          paddingHorizontal: 30,
+          borderRadius: 20,
+          width: 220,
+          alignItems: 'center',
+          marginTop: 15,
         }}
-    >
-        🧩 Memory Game
-    </Text>
-    </TouchableOpacity>
+      >
+        <Text style={{ color: 'white', fontSize: 20 }}>
+          {level >= 2 ? '🧩 Memory Game' : '🔒 Memory Game'}
+        </Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => setShowDashboard(true)}

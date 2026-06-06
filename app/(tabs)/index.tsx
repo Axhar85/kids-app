@@ -91,6 +91,7 @@ export default function HomeScreen() {
       setMode={setMode}
       selectedProfile={selectedProfile}
         setShowDashboard={setShowDashboard}
+        level={level}
     />
   );
 }
