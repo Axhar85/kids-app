@@ -2,10 +2,27 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
+type Profile = {
+  name: string;
+  avatar: string;
+};
+
+type ProfileStats = Profile & {
+  score: number;
+  level: number;
+  animalBadge: string;
+  memoryBadge: string;
+  memoryWins: number;
+};
+
+type ParentDashboardProps = {
+  setShowDashboard: (show: boolean) => void;
+};
+
 export default function ParentDashboard({
   setShowDashboard,
-}: any) {
-  const [profilesStats, setProfilesStats] = useState<any[]>([]);
+}: ParentDashboardProps) {
+  const [profilesStats, setProfilesStats] = useState<ProfileStats[]>([]);
 
   useEffect(() => {
     loadStats();
@@ -19,26 +36,17 @@ export default function ParentDashboard({
       return;
     }
 
-    const profiles = JSON.parse(savedProfiles);
-
+    const profiles: Profile[] = JSON.parse(savedProfiles);
     const stats = await Promise.all(
-      profiles.map(async (profile: any) => {
-        const scoreSaved = await AsyncStorage.getItem(
-          `score_${profile.name}`
-        );
-
-        const levelSaved = await AsyncStorage.getItem(
-          `level_${profile.name}`
-        );
-
+      profiles.map(async (profile) => {
+        const scoreSaved = await AsyncStorage.getItem(`score_${profile.name}`);
+        const levelSaved = await AsyncStorage.getItem(`level_${profile.name}`);
         const animalBadgeSaved = await AsyncStorage.getItem(
           `badge_${profile.name}`
         );
-
         const memoryBadgeSaved = await AsyncStorage.getItem(
           `memoryBadge_${profile.name}`
         );
-
         const memoryWinsSaved = await AsyncStorage.getItem(
           `memoryWins_${profile.name}`
         );
@@ -48,15 +56,9 @@ export default function ParentDashboard({
           avatar: profile.avatar,
           score: scoreSaved ? JSON.parse(scoreSaved) : 0,
           level: levelSaved ? JSON.parse(levelSaved) : 1,
-          animalBadge: animalBadgeSaved
-            ? JSON.parse(animalBadgeSaved)
-            : 'None',
-          memoryBadge: memoryBadgeSaved
-            ? JSON.parse(memoryBadgeSaved)
-            : 'None',
-            memoryWins: memoryWinsSaved
-            ? JSON.parse(memoryWinsSaved)
-            : 0,
+          animalBadge: animalBadgeSaved ? JSON.parse(animalBadgeSaved) : 'None',
+          memoryBadge: memoryBadgeSaved ? JSON.parse(memoryBadgeSaved) : 'None',
+          memoryWins: memoryWinsSaved ? JSON.parse(memoryWinsSaved) : 0,
         };
       })
     );

@@ -1,43 +1,46 @@
 import { Text, View } from 'react-native';
 
+type GameHeaderProps = {
+  score: number;
+  level: number;
+  badge: string;
+  showBadgePopup: boolean;
+};
+
 export default function GameHeader({
   score,
   level,
   badge,
-  showBadgePopup
-}: any) {
+  showBadgePopup,
+}: GameHeaderProps) {
   return (
     <View
       style={{
         alignItems: 'center',
         paddingTop: 20,
         paddingBottom: 15,
-        backgroundColor: '#FFF8E1'
+        backgroundColor: '#FFF8E1',
       }}
     >
       <Text
         style={{
           fontSize: 36,
-          fontWeight: 'bold'
+          fontWeight: 'bold',
         }}
       >
         🎮 Fun Animal Game
       </Text>
 
-      <Text style={{ fontSize: 22 }}>
-        ⭐ Score: {score}
-      </Text>
+      <Text style={{ fontSize: 22 }}>⭐ Score: {score}</Text>
 
-      <Text style={{ fontSize: 22 }}>
-        🏆 Level: {level}
-      </Text>
+      <Text style={{ fontSize: 22 }}>🏆 Level: {level}</Text>
 
       {!!badge && (
         <Text
           style={{
             fontSize: 20,
             color: '#E65100',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
           }}
         >
           {badge}
@@ -50,7 +53,7 @@ export default function GameHeader({
             fontSize: 24,
             color: '#FF6F00',
             fontWeight: 'bold',
-            marginTop: 10
+            marginTop: 10,
           }}
         >
           🎉 NEW BADGE!

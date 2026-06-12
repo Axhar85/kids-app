@@ -1,6 +1,10 @@
 import { Text, TouchableOpacity, View } from 'react-native';
 
-export default function QuizGame({ setMode }: any) {
+type QuizGameProps = {
+  setMode: (mode: string | null) => void;
+};
+
+export default function QuizGame({ setMode }: QuizGameProps) {
   return (
     <View
       style={{
@@ -14,14 +18,10 @@ export default function QuizGame({ setMode }: any) {
         🧠 Quiz Game
       </Text>
 
-      <Text style={{ fontSize: 20, marginBottom: 20 }}>
-        Coming soon!
-      </Text>
+      <Text style={{ fontSize: 20, marginBottom: 20 }}>Coming soon!</Text>
 
       <TouchableOpacity onPress={() => setMode(null)}>
-        <Text style={{ color: 'blue', fontSize: 20 }}>
-          ⬅ Back
-        </Text>
+        <Text style={{ color: 'blue', fontSize: 20 }}>⬅ Back</Text>
       </TouchableOpacity>
     </View>
   );

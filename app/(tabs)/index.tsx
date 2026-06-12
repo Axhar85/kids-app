@@ -11,7 +11,6 @@ import ProfileSelection from '../../screens/ProfileSelection';
 import QuizGame from '../../screens/QuizGame';
 import ToddlerGame from '../../screens/ToddlerGame';
 
-
 export default function HomeScreen() {
   const [name, setName] = useState('');
   const [language, setLanguage] = useState('en');
@@ -19,8 +18,6 @@ export default function HomeScreen() {
   const [showDashboard, setShowDashboard] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
   const [showBadges, setShowBadges] = useState(false);
-  
-  console.log('Current Profile:', selectedProfile);
 
   const {
     targetAnimal,
@@ -41,11 +38,6 @@ export default function HomeScreen() {
     showBadgePopup,
   } = useToddlerGame(selectedProfile);
 
-
-
-
-
-  // 🔊 Play sound
   const playSound = async () => {
     const { sound } = await Audio.Sound.createAsync(
       require('../../assets/sounds/hello.mp3')
@@ -53,109 +45,84 @@ export default function HomeScreen() {
     await sound.playAsync();
   };
 
-
-  // 🗣️ Speak name
   const speakName = () => {
     if (!name) return;
 
     const text =
-      language === 'en'
-        ? `Hello ${name}`
-        : `السلام علیکم ${name}`;
+      language === 'en' ? `Hello ${name}` : `السلام علیکم ${name}`;
 
     Speech.speak(text);
   };
 
-    if (showDashboard) {
+  if (showDashboard) {
+    return <ParentDashboard setShowDashboard={setShowDashboard} />;
+  }
 
+  if (!selectedProfile) {
+    return <ProfileSelection setSelectedProfile={setSelectedProfile} />;
+  }
+
+  if (!mode) {
     return (
-      <ParentDashboard
-        setShowDashboard={
-          setShowDashboard
-        }
+      <ModeSelection
+        setMode={setMode}
+        selectedProfile={selectedProfile}
+        setShowDashboard={setShowDashboard}
+        level={level}
       />
     );
   }
-  if (!selectedProfile) {
-  return (
-    <ProfileSelection
-      setSelectedProfile={setSelectedProfile}
-    />
-  );
-}
 
-
-  // 🟡 SCREEN 1: Mode Selection
-  if (!mode) {
-  return (
-    <ModeSelection
-      setMode={setMode}
-      selectedProfile={selectedProfile}
-        setShowDashboard={setShowDashboard}
-        level={level}
-    />
-  );
-}
-
-if (showBadges) {
-  return (
-    <BadgesScreen
-      badge={badge}
-      setShowBadges={setShowBadges}
-    />
-  );
-}
+  if (showBadges) {
+    return <BadgesScreen badge={badge} setShowBadges={setShowBadges} />;
+  }
 
   if (mode === 'toddler') {
-  return (
-    <ToddlerGame
-      score={score}
-      level={level}
-      showStars={showStars}
-      targetAnimal={targetAnimal}
-      selectedAnimal={selectedAnimal}
-      scaleAnim={scaleAnim}
-      setSelectedAnimal={setSelectedAnimal}
-      animateButton={animateButton}
-      playAnimalSound={playAnimalSound}
-      setScore={setScore}
-      setShowStars={setShowStars}
-      chooseRandomAnimal={chooseRandomAnimal}
-      setLevel={setLevel}
-      setMode={setMode}
-      handleAnimalPress={handleAnimalPress}
-      badge={badge}
-      showBadgePopup={showBadgePopup}
-      setShowBadges={setShowBadges}
-    />
-  );
-}
-if (mode === 'memory') {
-  return (
-    <MemoryGame
-      setMode={setMode}
-      selectedProfile={selectedProfile}
-    />
-  );
-}
+    return (
+      <ToddlerGame
+        score={score}
+        level={level}
+        showStars={showStars}
+        targetAnimal={targetAnimal}
+        selectedAnimal={selectedAnimal}
+        scaleAnim={scaleAnim}
+        setSelectedAnimal={setSelectedAnimal}
+        animateButton={animateButton}
+        playAnimalSound={playAnimalSound}
+        setScore={setScore}
+        setShowStars={setShowStars}
+        chooseRandomAnimal={chooseRandomAnimal}
+        setLevel={setLevel}
+        setMode={setMode}
+        handleAnimalPress={handleAnimalPress}
+        badge={badge}
+        showBadgePopup={showBadgePopup}
+        setShowBadges={setShowBadges}
+      />
+    );
+  }
 
-    if (mode === 'quiz') {
+  if (mode === 'memory') {
+    return <MemoryGame setMode={setMode} selectedProfile={selectedProfile} />;
+  }
+
+  if (mode === 'quiz') {
     return <QuizGame setMode={setMode} />;
   }
 
-
   if (mode === 'big') {
-  return (
-    <BigKidsGame
-      name={name}
-      setName={setName}
-      language={language}
-      setLanguage={setLanguage}
-      playSound={playSound}
-      speakName={speakName}
-      setMode={setMode}
-    />
-  );
-}
-    
+    return (
+      <BigKidsGame
+        name={name}
+        setName={setName}
+        language={language}
+        setLanguage={setLanguage}
+        playSound={playSound}
+        speakName={speakName}
+        setMode={setMode}
+      />
+    );
+  }
+
+  return null;
 }

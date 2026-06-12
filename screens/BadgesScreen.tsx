@@ -1,16 +1,20 @@
 import { Text, TouchableOpacity, View } from 'react-native';
 
+type BadgesScreenProps = {
+  badge: string;
+  setShowBadges: (show: boolean) => void;
+};
+
+const badges = [
+  '🥉 Animal Explorer',
+  '🥈 Animal Expert',
+  '🥇 Animal Master',
+];
+
 export default function BadgesScreen({
   badge,
   setShowBadges,
-}: any) {
-
-  const badges = [
-    '🥉 Animal Explorer',
-    '🥈 Animal Expert',
-    '🥇 Animal Master',
-  ];
-
+}: BadgesScreenProps) {
   return (
     <View
       style={{
@@ -31,7 +35,6 @@ export default function BadgesScreen({
       </Text>
 
       {badges.map((item) => (
-
         <Text
           key={item}
           style={{
@@ -42,12 +45,9 @@ export default function BadgesScreen({
           {item === badge ? '✅ ' : '❌ '}
           {item}
         </Text>
-
       ))}
 
-      <TouchableOpacity
-        onPress={() => setShowBadges(false)}
-      >
+      <TouchableOpacity onPress={() => setShowBadges(false)}>
         <Text
           style={{
             marginTop: 30,

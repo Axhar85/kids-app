@@ -1,5 +1,15 @@
 import { Text, TextInput, TouchableOpacity, View } from 'react-native';
 
+type BigKidsGameProps = {
+  name: string;
+  setName: (name: string) => void;
+  language: string;
+  setLanguage: (language: string) => void;
+  playSound: () => void;
+  speakName: () => void;
+  setMode: (mode: string | null) => void;
+};
+
 export default function BigKidsGame({
   name,
   setName,
@@ -7,48 +17,38 @@ export default function BigKidsGame({
   setLanguage,
   playSound,
   speakName,
-  setMode
-}: any) {
+  setMode,
+}: BigKidsGameProps) {
   return (
     <View
       style={{
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'white'
+        backgroundColor: 'white',
       }}
     >
       <Text style={{ fontSize: 24, marginBottom: 20 }}>
-        {language === 'en'
-          ? 'Enter your name:'
-          : 'اپنا نام لکھیں:'}
+        {language === 'en' ? 'Enter your name:' : 'اپنا نام لکھیں:'}
       </Text>
 
       <TouchableOpacity
-        onPress={() =>
-          setLanguage(
-            language === 'en'
-              ? 'ur'
-              : 'en'
-          )
-        }
+        onPress={() => setLanguage(language === 'en' ? 'ur' : 'en')}
         style={{
           backgroundColor: '#4CAF50',
           paddingVertical: 10,
           paddingHorizontal: 20,
           borderRadius: 25,
-          marginBottom: 20
+          marginBottom: 20,
         }}
       >
         <Text
           style={{
             color: 'white',
-            fontSize: 16
+            fontSize: 16,
           }}
         >
-          {language === 'en'
-            ? 'Switch to Urdu'
-            : 'Switch to English'}
+          {language === 'en' ? 'Switch to Urdu' : 'Switch to English'}
         </Text>
       </TouchableOpacity>
 
@@ -66,7 +66,7 @@ export default function BigKidsGame({
           borderWidth: 1,
           width: 220,
           padding: 10,
-          marginBottom: 20
+          marginBottom: 20,
         }}
       />
 
@@ -76,13 +76,11 @@ export default function BigKidsGame({
           : `السلام علیکم ${name} 👋`}
       </Text>
 
-      <TouchableOpacity
-        onPress={() => setMode(null)}
-      >
+      <TouchableOpacity onPress={() => setMode(null)}>
         <Text
           style={{
             marginTop: 20,
-            color: 'blue'
+            color: 'blue',
           }}
         >
           ⬅ Back

@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react';
 import { Animated } from 'react-native';
 import animals from '../data/animals';
 
-export default function useToddlerGame(selectedProfile: string | null) {
+type Animal = (typeof animals)[number];
 
-  const [targetAnimal, setTargetAnimal] = useState<any>(null);
+export default function useToddlerGame(selectedProfile: string | null) {
+  const [targetAnimal, setTargetAnimal] = useState<Animal | null>(null);
   const [score, setScore] = useState(0);
   const [selectedAnimal, setSelectedAnimal] = useState('');
   const [showStars, setShowStars] = useState(false);
@@ -18,12 +19,11 @@ export default function useToddlerGame(selectedProfile: string | null) {
   const scaleAnim = useState(new Animated.Value(1))[0];
 
   useEffect(() => {
-  if (selectedProfile) {
-    loadProgress();
-  }
-}, [selectedProfile]);
+    if (selectedProfile) {
+      loadProgress();
+    }
+  }, [selectedProfile]);
 
-  // ANIMATION
   const animateButton = () => {
     Animated.sequence([
       Animated.timing(scaleAnim, {
@@ -31,7 +31,6 @@ export default function useToddlerGame(selectedProfile: string | null) {
         duration: 150,
         useNativeDriver: true,
       }),
-
       Animated.timing(scaleAnim, {
         toValue: 1,
         duration: 150,
@@ -40,206 +39,120 @@ export default function useToddlerGame(selectedProfile: string | null) {
     ]).start();
   };
 
-  // PLAY SOUND
   const playAnimalSound = async (soundFile: any) => {
     const { sound } = await Audio.Sound.createAsync(soundFile);
-
     await sound.playAsync();
   };
 
-  // RANDOM ANIMAL
   const chooseRandomAnimal = () => {
-
     const visibleAnimals = animals.slice(0, level + 2);
-
-    const randomIndex = Math.floor(
-      Math.random() * visibleAnimals.length
-    );
+    const randomIndex = Math.floor(Math.random() * visibleAnimals.length);
 
     setTargetAnimal(visibleAnimals[randomIndex]);
   };
 
+  const saveBadge = async (newBadge: string) => {
+    try {
+      if (!selectedProfile) return;
 
-    const saveBadge = async (
-      newBadge: string
-    ) => {
-
-      try {
-
-        if (!selectedProfile) return;
-
-        await AsyncStorage.setItem(
-          `badge_${selectedProfile}`,
-          JSON.stringify(newBadge)
-        );
-
-      } catch (error) {
-
-        console.log('Badge save error', error);
-      }
-    };
-
-  // Badge
-  const checkBadge = (newScore: number) => {
-
-  let newBadge = '';
-
-  if (newScore >= 10) {
-    newBadge = '🥇 Animal Master';
-  }
-  else if (newScore >= 5) {
-    newBadge = '🥈 Animal Expert';
-  }
-  else if (newScore >= 1) {
-    newBadge = '🥉 Animal Explorer';
-  }
-
-  if (newBadge && newBadge !== badge) {
-
-    setBadge(newBadge);
-
-    saveBadge(newBadge);
-
-    setShowBadgePopup(true);
-
-    setTimeout(() => {
-      setShowBadgePopup(false);
-    }, 2000);
-
-  }
-};
-    const checkAchievements = (newLevel: number) => {
-
-    if (newLevel === 2) {
-
-      setBadge('🥉 Animal Explorer');
-
-    } else if (newLevel === 5) {
-
-      setBadge('🥈 Animal Expert');
-
-    } else if (newLevel === 10) {
-
-      setBadge('🥇 Animal Master');
-
+      await AsyncStorage.setItem(
+        `badge_${selectedProfile}`,
+        JSON.stringify(newBadge)
+      );
+    } catch (error) {
+      console.log('Badge save error', error);
     }
-
   };
 
+  const checkBadge = (newScore: number) => {
+    let newBadge = '';
 
+    if (newScore >= 10) {
+      newBadge = '🥇 Animal Master';
+    } else if (newScore >= 5) {
+      newBadge = '🥈 Animal Expert';
+    } else if (newScore >= 1) {
+      newBadge = '🥉 Animal Explorer';
+    }
 
-  // HANDLE PRESS
-  const handleAnimalPress = (animal: any) => {
+    if (newBadge && newBadge !== badge) {
+      setBadge(newBadge);
+      saveBadge(newBadge);
+      setShowBadgePopup(true);
 
+      setTimeout(() => {
+        setShowBadgePopup(false);
+      }, 2000);
+    }
+  };
+
+  const handleAnimalPress = (animal: Animal) => {
     setSelectedAnimal(animal.name);
-
     animateButton();
-
     playAnimalSound(animal.sound);
 
-    if (targetAnimal?.name === animal.name) {
-
-  const newScore = score + 1;
-
-  setScore(newScore);
-
-  checkBadge(newScore);
-
-  saveProgress(newScore, level);
-
-  setShowStars(true);
-
-  Speech.speak('Great Job!');
-
-  setTimeout(() => {
-    setShowStars(false);
-  }, 1500);
-
-  chooseRandomAnimal();
-
-  if (newScore % 3 === 0) {
-
-    setLevel(level + 1);
-
-    saveProgress(newScore, level + 1);
-
-    Speech.speak('Level Up!');
-    
-  }
-   checkAchievements(level + 1);
-}
- else {
-
+    if (targetAnimal?.name !== animal.name) {
       Speech.speak('Try Again');
+      return;
+    }
+
+    const newScore = score + 1;
+    const newLevel = newScore % 3 === 0 ? level + 1 : level;
+
+    setScore(newScore);
+    setLevel(newLevel);
+    setShowStars(true);
+    checkBadge(newScore);
+    saveProgress(newScore, newLevel);
+    Speech.speak(newLevel > level ? 'Level Up!' : 'Great Job!');
+
+    setTimeout(() => {
+      setShowStars(false);
+    }, 1500);
+
+    chooseRandomAnimal();
+  };
+
+  const saveProgress = async (newScore: number, newLevel: number) => {
+    try {
+      if (!selectedProfile) return;
+
+      await AsyncStorage.setItem(
+        `score_${selectedProfile}`,
+        JSON.stringify(newScore)
+      );
+      await AsyncStorage.setItem(
+        `level_${selectedProfile}`,
+        JSON.stringify(newLevel)
+      );
+    } catch (error) {
+      console.log('Save error', error);
     }
   };
 
-  // Save function
-  const saveProgress = async (
-  newScore: number,
-  newLevel: number,
-) => {
-    
-  console.log('Saving profile:', selectedProfile);
-  console.log('Saving score:', newScore);
-  console.log('Saving level:', newLevel);
+  const loadProgress = async () => {
+    try {
+      if (!selectedProfile) return;
 
-  try {
+      const savedScore = await AsyncStorage.getItem(`score_${selectedProfile}`);
+      const savedLevel = await AsyncStorage.getItem(`level_${selectedProfile}`);
+      const savedBadge = await AsyncStorage.getItem(`badge_${selectedProfile}`);
 
-    if (!selectedProfile) return;
+      if (savedScore !== null) {
+        setScore(JSON.parse(savedScore));
+      }
 
-    await AsyncStorage.setItem(
-    `score_${selectedProfile}`,
-        JSON.stringify(newScore)
-    );
+      if (savedLevel !== null) {
+        setLevel(JSON.parse(savedLevel));
+      }
 
-    await AsyncStorage.setItem(
-    `level_${selectedProfile}`,
-    JSON.stringify(newLevel)
-    );
-
-  } catch (error) {
-
-    console.log('Save error', error);
-  }
-};
-
-
-    // Load function
-    const loadProgress = async () => {
-        
-  try {
-
-    if (!selectedProfile) return;
-
-    const savedScore =
-    await AsyncStorage.getItem(
-    `score_${selectedProfile}`
-    );
-
-    const savedLevel =
-    await AsyncStorage.getItem(
-    `level_${selectedProfile}`
-    );
-
-    if (savedScore !== null) {
-      setScore(JSON.parse(savedScore));
+      if (savedBadge !== null) {
+        setBadge(JSON.parse(savedBadge));
+      }
+    } catch (error) {
+      console.log('Load error', error);
     }
-
-    if (savedLevel !== null) {
-      setLevel(JSON.parse(savedLevel));
-    }
-console.log('Loading profile:', selectedProfile);
-console.log('Saved score:', savedScore);
-console.log('Saved level:', savedLevel);
-  } catch (error) {
-
-    console.log('Load error', error);
-  }
-  
-};
-
-
+  };
 
   return {
     targetAnimal,

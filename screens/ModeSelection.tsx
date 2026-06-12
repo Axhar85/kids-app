@@ -1,17 +1,18 @@
 import { Text, TouchableOpacity, View } from 'react-native';
 
+type ModeSelectionProps = {
+  setMode: (mode: string) => void;
+  selectedProfile: string;
+  setShowDashboard: (show: boolean) => void;
+  level: number;
+};
 
 export default function ModeSelection({
   setMode,
   selectedProfile,
   setShowDashboard,
   level,
-}: {
-  setMode: (mode: string) => void;
-  selectedProfile: string;
-  setShowDashboard: (show: boolean) => void;
-  level: number;
-}) {
+}: ModeSelectionProps) {
   return (
     <View
       style={{
@@ -82,6 +83,7 @@ export default function ModeSelection({
           🧒 Big Kids
         </Text>
       </TouchableOpacity>
+
       <TouchableOpacity
         onPress={() => {
           if (level >= 2) {
@@ -102,26 +104,28 @@ export default function ModeSelection({
           {level >= 2 ? '🧩 Memory Game' : '🔒 Memory Game'}
         </Text>
       </TouchableOpacity>
-          <TouchableOpacity
-  onPress={() => {
-    if (level >= 5) {
-      setMode('quiz');
-    }
-  }}
-  style={{
-    backgroundColor: level >= 5 ? '#673AB7' : '#9E9E9E',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 20,
-    width: 220,
-    alignItems: 'center',
-    marginTop: 15,
-  }}
->
-  <Text style={{ color: 'white', fontSize: 20 }}>
-    {level >= 5 ? '🧠 Quiz Game' : '🔒 Quiz Game'}
-  </Text>
-</TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => {
+          if (level >= 5) {
+            setMode('quiz');
+          }
+        }}
+        style={{
+          backgroundColor: level >= 5 ? '#673AB7' : '#9E9E9E',
+          paddingVertical: 15,
+          paddingHorizontal: 30,
+          borderRadius: 20,
+          width: 220,
+          alignItems: 'center',
+          marginTop: 15,
+        }}
+      >
+        <Text style={{ color: 'white', fontSize: 20 }}>
+          {level >= 5 ? '🧠 Quiz Game' : '🔒 Quiz Game'}
+        </Text>
+      </TouchableOpacity>
+
       <TouchableOpacity
         onPress={() => setShowDashboard(true)}
         style={{
@@ -143,7 +147,6 @@ export default function ModeSelection({
           👨 Dashboard
         </Text>
       </TouchableOpacity>
-          
     </View>
   );
 }

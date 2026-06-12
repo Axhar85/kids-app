@@ -3,87 +3,65 @@ import { Audio } from 'expo-av';
 import { useEffect, useState } from 'react';
 import {
   Image,
+  ImageSourcePropType,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 
+type Difficulty = 'easy' | 'medium' | 'hard';
+
+type MemoryCard = {
+  image: ImageSourcePropType;
+};
+
+type MemoryGameProps = {
+  setMode: (mode: string | null) => void;
+  selectedProfile: string;
+};
+
+const animalCards: MemoryCard[] = [
+  { image: require('../assets/images/dog.png') },
+  { image: require('../assets/images/cat.png') },
+  { image: require('../assets/images/cow.png') },
+  { image: require('../assets/images/lion.png') },
+  { image: require('../assets/images/duck.png') },
+  { image: require('../assets/images/monkey.png') },
+];
+
 export default function MemoryGame({
   setMode,
   selectedProfile,
-}: any) {
-
+}: MemoryGameProps) {
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<number[]>([]);
-  const [cards, setCards] = useState<any[]>([]);
+  const [cards, setCards] = useState<MemoryCard[]>([]);
   const [score, setScore] = useState(0);
   const [won, setWon] = useState(false);
-  const [difficulty, setDifficulty] = useState('medium');
+  const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [stars, setStars] = useState(0);
-  const [memoryAchievement, setMemoryAchievement] =   useState('');
-
-  const animalCards = [
-    {
-      image: require('../assets/images/dog.png'),
-    },
-    {
-      image: require('../assets/images/cat.png'),
-    },
-    {
-      image: require('../assets/images/cow.png'),
-    },
-    {
-      image: require('../assets/images/lion.png'),
-    },
-    {
-      image: require('../assets/images/duck.png'),
-    },
-    {
-      image: require('../assets/images/monkey.png'),
-    },
-  ];
+  const [memoryAchievement, setMemoryAchievement] = useState('');
 
   useEffect(() => {
     shuffleCards();
   }, [difficulty]);
 
   const shuffleCards = () => {
+    const selectedAnimals =
+      difficulty === 'easy'
+        ? animalCards.slice(0, 3)
+        : difficulty === 'medium'
+          ? animalCards.slice(0, 6)
+          : animalCards;
 
-    let selectedAnimals: any[] = [];
-
-    if (difficulty === 'easy') {
-
-      selectedAnimals =
-        animalCards.slice(0, 3);
-
-    } else if (difficulty === 'medium') {
-
-      selectedAnimals =
-        animalCards.slice(0, 6);
-
-    } else {
-
-      selectedAnimals =
-        animalCards;
-
-    }
-
-    const duplicated = [
-      ...selectedAnimals,
-      ...selectedAnimals,
-    ];
-
-    const shuffled =
-      [...duplicated].sort(
-        () => Math.random() - 0.5
-      );
+    const duplicated = [...selectedAnimals, ...selectedAnimals];
+    const shuffled = [...duplicated].sort(() => Math.random() - 0.5);
 
     setCards(shuffled);
   };
 
   const resetGame = () => {
-
     setFlipped([]);
     setMatched([]);
     setScore(0);
@@ -92,202 +70,100 @@ export default function MemoryGame({
   };
 
   const restartGame = () => {
-
     resetGame();
     shuffleCards();
   };
 
+  const saveMemoryWin = async () => {
+    if (!selectedProfile) return;
 
-    const saveMemoryWin = async () => {
+    const savedWins = await AsyncStorage.getItem(
+      `memoryWins_${selectedProfile}`
+    );
+    const wins = savedWins ? JSON.parse(savedWins) : 0;
 
-      if (!selectedProfile) return;
-
-      const savedWins =
-        await AsyncStorage.getItem(
-          `memoryWins_${selectedProfile}`
-        );
-
-      const wins =
-        savedWins
-          ? JSON.parse(savedWins)
-          : 0;
-
-      await AsyncStorage.setItem(
-        `memoryWins_${selectedProfile}`,
-        JSON.stringify(wins + 1)
-      );
-    };
-
-
+    await AsyncStorage.setItem(
+      `memoryWins_${selectedProfile}`,
+      JSON.stringify(wins + 1)
+    );
+  };
 
   const playCorrectSound = async () => {
-
-    const { sound } =
-      await Audio.Sound.createAsync(
-        require('../assets/sounds/correct.mp3')
-      );
-
+    const { sound } = await Audio.Sound.createAsync(
+      require('../assets/sounds/correct.mp3')
+    );
     await sound.playAsync();
   };
 
   const playWrongSound = async () => {
-
-    const { sound } =
-      await Audio.Sound.createAsync(
-        require('../assets/sounds/wrong.mp3')
-      );
-
+    const { sound } = await Audio.Sound.createAsync(
+      require('../assets/sounds/wrong.mp3')
+    );
     await sound.playAsync();
   };
 
   const playWinSound = async () => {
-
-    const { sound } =
-      await Audio.Sound.createAsync(
-        require('../assets/sounds/win.mp3')
-      );
-
+    const { sound } = await Audio.Sound.createAsync(
+      require('../assets/sounds/win.mp3')
+    );
     await sound.playAsync();
   };
 
-
-  const saveMemoryAchievement = async (
-  achievement: string
-) => {
-
-  try {
-
+  const saveMemoryAchievement = async (achievement: string) => {
     if (!selectedProfile) return;
+
     await AsyncStorage.setItem(
       `memoryBadge_${selectedProfile}`,
       JSON.stringify(achievement)
     );
-
-  } catch (error) {
-
-    console.log(error);
-
-  }
-
-};
-
-
+  };
 
   const handleCardPress = (index: number) => {
-
-    if (
-      flipped.includes(index) ||
-      matched.includes(index)
-    ) {
+    if (flipped.includes(index) || matched.includes(index)) {
       return;
     }
 
-    const newFlipped = [
-      ...flipped,
-      index,
-    ];
-
+    const newFlipped = [...flipped, index];
     setFlipped(newFlipped);
 
-    if (newFlipped.length === 2) {
+    if (newFlipped.length !== 2) return;
 
-      const firstCard =
-        cards[newFlipped[0]];
+    const firstCard = cards[newFlipped[0]];
+    const secondCard = cards[newFlipped[1]];
 
-      const secondCard =
-        cards[newFlipped[1]];
+    if (firstCard.image === secondCard.image) {
+      playCorrectSound();
 
-      if (
-        firstCard.image ===
-        secondCard.image
-      ) {
+      const newScore = score + 1;
+      const newMatched = [...matched, ...newFlipped];
 
-        playCorrectSound();
+      setScore(newScore);
+      setMatched(newMatched);
+      setFlipped([]);
 
-        const newScore =
-          score + 1;
+      if (newMatched.length === cards.length) {
+        const achievement =
+          difficulty === 'easy'
+            ? '🧠 Memory Beginner'
+            : difficulty === 'medium'
+              ? '🧠 Memory Expert'
+              : '🧠 Memory Master';
 
-        setScore(newScore);
-
-        const newMatched = [
-          ...matched,
-          ...newFlipped,
-        ];
-
-        setMatched(newMatched);
-
-        if (
-          newMatched.length ===
-          cards.length
-          
-        ) {
-
-          
-          setWon(true);
-          saveMemoryWin();
-
-          let achievement = '';
-
-            if (difficulty === 'easy') {
-
-              achievement =
-                '🧠 Memory Beginner';
-
-            }
-            else if (
-              difficulty === 'medium'
-            ) {
-
-              achievement =
-                '🧠 Memory Expert';
-
-            }
-            else {
-
-              achievement =
-                '🧠 Memory Master';
-
-            }
-
-            setMemoryAchievement(
-              achievement
-            );
-
-            saveMemoryAchievement(
-              achievement
-            );
-
-          playWinSound();
-
-          if (difficulty === 'easy') {
-
-            setStars(1);
-
-          } else if (
-            difficulty === 'medium'
-          ) {
-
-            setStars(2);
-
-          } else {
-
-            setStars(3);
-          }
-        }
-
-        setFlipped([]);
-
-      } else {
-
-        playWrongSound();
-
-        setTimeout(() => {
-
-          setFlipped([]);
-
-        }, 1000);
+        setWon(true);
+        setMemoryAchievement(achievement);
+        setStars(difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3);
+        saveMemoryWin();
+        saveMemoryAchievement(achievement);
+        playWinSound();
       }
+
+      return;
     }
+
+    playWrongSound();
+    setTimeout(() => {
+      setFlipped([]);
+    }, 1000);
   };
 
   return (
@@ -299,7 +175,6 @@ export default function MemoryGame({
         paddingTop: 30,
       }}
     >
-
       <Text
         style={{
           fontSize: 32,
@@ -316,7 +191,6 @@ export default function MemoryGame({
           marginBottom: 15,
         }}
       >
-
         <TouchableOpacity
           onPress={() => {
             resetGame();
@@ -329,13 +203,7 @@ export default function MemoryGame({
             borderRadius: 10,
           }}
         >
-          <Text
-            style={{
-              color: 'white',
-            }}
-          >
-            Easy
-          </Text>
+          <Text style={{ color: 'white' }}>Easy</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -350,9 +218,7 @@ export default function MemoryGame({
             borderRadius: 10,
           }}
         >
-          <Text>
-            Medium
-          </Text>
+          <Text>Medium</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -367,15 +233,8 @@ export default function MemoryGame({
             borderRadius: 10,
           }}
         >
-          <Text
-            style={{
-              color: 'white',
-            }}
-          >
-            Hard
-          </Text>
+          <Text style={{ color: 'white' }}>Hard</Text>
         </TouchableOpacity>
-
       </View>
 
       <Text
@@ -394,7 +253,6 @@ export default function MemoryGame({
             marginBottom: 20,
           }}
         >
-
           <Text
             style={{
               fontSize: 30,
@@ -412,7 +270,9 @@ export default function MemoryGame({
             }}
           >
             Final Score: {score}
-            <Text
+          </Text>
+
+          <Text
             style={{
               fontSize: 24,
               marginTop: 10,
@@ -421,7 +281,6 @@ export default function MemoryGame({
             }}
           >
             {memoryAchievement}
-          </Text>
           </Text>
 
           <Text
@@ -451,16 +310,10 @@ export default function MemoryGame({
               🔄 Play Again
             </Text>
           </TouchableOpacity>
-
         </View>
       )}
 
-      <ScrollView
-        style={{
-          maxHeight: '60%',
-        }}
-      >
-
+      <ScrollView style={{ maxHeight: '60%' }}>
         <View
           style={{
             flexDirection: 'row',
@@ -469,14 +322,10 @@ export default function MemoryGame({
             justifyContent: 'center',
           }}
         >
-
           {cards.map((card, index) => (
-
             <TouchableOpacity
               key={index}
-              onPress={() =>
-                handleCardPress(index)
-              }
+              onPress={() => handleCardPress(index)}
               style={{
                 width: 80,
                 height: 80,
@@ -487,10 +336,7 @@ export default function MemoryGame({
                 borderRadius: 10,
               }}
             >
-
-              {flipped.includes(index) ||
-              matched.includes(index) ? (
-
+              {flipped.includes(index) || matched.includes(index) ? (
                 <Image
                   source={card.image}
                   style={{
@@ -499,30 +345,15 @@ export default function MemoryGame({
                     resizeMode: 'contain',
                   }}
                 />
-
               ) : (
-
-                <Text
-                  style={{
-                    fontSize: 30,
-                  }}
-                >
-                  ❓
-                </Text>
-
+                <Text style={{ fontSize: 30 }}>❓</Text>
               )}
-
             </TouchableOpacity>
-
           ))}
-
         </View>
-
       </ScrollView>
 
-      <TouchableOpacity
-        onPress={() => setMode(null)}
-      >
+      <TouchableOpacity onPress={() => setMode(null)}>
         <Text
           style={{
             marginTop: 20,
@@ -533,7 +364,6 @@ export default function MemoryGame({
           ⬅ Back
         </Text>
       </TouchableOpacity>
-
     </View>
   );
 }
