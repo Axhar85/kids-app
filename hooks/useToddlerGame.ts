@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import animals, { Animal, getAnimalsForLevel } from '../data/animals';
 
@@ -22,6 +22,11 @@ const normalizeSavedBadge = (savedBadge: string) => {
   return savedBadge;
 };
 
+const speak = (text: string) => {
+  Speech.stop();
+  Speech.speak(text);
+};
+
 export default function useToddlerGame(selectedProfile: string | null) {
   const [targetAnimal, setTargetAnimal] = useState<Animal | null>(null);
   const [score, setScore] = useState(0);
@@ -31,6 +36,8 @@ export default function useToddlerGame(selectedProfile: string | null) {
   const [badge, setBadge] = useState('');
   const [showBadgePopup, setShowBadgePopup] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const currentSoundRef = useRef<Audio.Sound | null>(null);
+  const soundStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const scaleAnim = useState(new Animated.Value(1))[0];
 
@@ -39,6 +46,12 @@ export default function useToddlerGame(selectedProfile: string | null) {
       loadProgress();
     }
   }, [selectedProfile]);
+
+  useEffect(() => {
+    return () => {
+      stopCurrentSound();
+    };
+  }, []);
 
   const animateButton = () => {
     Animated.sequence([
@@ -56,21 +69,49 @@ export default function useToddlerGame(selectedProfile: string | null) {
   };
 
   const speakInstruction = (animal: Animal) => {
-    Speech.speak(`Find the ${animal.name}`);
+    speak(`Find the ${animal.name}`);
   };
 
-  const playSound = async (soundFile: number) => {
+  const stopCurrentSound = async () => {
+    if (soundStopTimerRef.current) {
+      clearTimeout(soundStopTimerRef.current);
+      soundStopTimerRef.current = null;
+    }
+
+    const currentSound = currentSoundRef.current;
+    currentSoundRef.current = null;
+
+    if (!currentSound) return;
+
+    try {
+      await currentSound.stopAsync();
+      await currentSound.unloadAsync();
+    } catch (error) {
+      console.log('Sound stop error', error);
+    }
+  };
+
+  const playSound = async (soundFile: number, maxMs = 1400) => {
+    await stopCurrentSound();
+
     const { sound } = await Audio.Sound.createAsync(soundFile);
+    currentSoundRef.current = sound;
+
     await sound.playAsync();
+
+    soundStopTimerRef.current = setTimeout(() => {
+      stopCurrentSound();
+    }, maxMs);
   };
 
   const playAnimalSound = async (animal: Animal) => {
     if (animal.sound) {
-      await playSound(animal.sound);
+      await playSound(animal.sound, animal.soundMaxMs);
       return;
     }
 
-    Speech.speak(animal.name);
+    await stopCurrentSound();
+    speak(animal.fallbackSoundText ?? animal.name);
   };
 
   const chooseRandomAnimal = (levelOverride = level, announce = true) => {
@@ -137,7 +178,7 @@ export default function useToddlerGame(selectedProfile: string | null) {
 
     if (targetAnimal.name !== animal.name) {
       setFeedback('wrong');
-      Speech.speak('Try again');
+      speak('Try again');
       clearFeedbackSoon();
       return;
     }
@@ -152,7 +193,7 @@ export default function useToddlerGame(selectedProfile: string | null) {
     setFeedback(didLevelUp ? 'level-up' : 'correct');
     checkBadge(newScore);
     saveProgress(newScore, newLevel);
-    Speech.speak(didLevelUp ? 'Level up!' : 'Great job!');
+    speak(didLevelUp ? 'Level up!' : 'Great job!');
     clearFeedbackSoon();
 
     setTimeout(() => {
