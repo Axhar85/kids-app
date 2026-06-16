@@ -3,9 +3,16 @@ import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 import { useEffect, useState } from 'react';
 import { Animated } from 'react-native';
-import animals from '../data/animals';
+import animals, { Animal, getAnimalsForLevel } from '../data/animals';
 
-type Animal = (typeof animals)[number];
+type Feedback = 'correct' | 'wrong' | 'level-up' | null;
+
+const getRandomAnimal = (level: number) => {
+  const visibleAnimals = getAnimalsForLevel(level);
+  const randomIndex = Math.floor(Math.random() * visibleAnimals.length);
+
+  return visibleAnimals[randomIndex] ?? animals[0];
+};
 
 export default function useToddlerGame(selectedProfile: string | null) {
   const [targetAnimal, setTargetAnimal] = useState<Animal | null>(null);
@@ -15,6 +22,7 @@ export default function useToddlerGame(selectedProfile: string | null) {
   const [level, setLevel] = useState(1);
   const [badge, setBadge] = useState('');
   const [showBadgePopup, setShowBadgePopup] = useState(false);
+  const [feedback, setFeedback] = useState<Feedback>(null);
 
   const scaleAnim = useState(new Animated.Value(1))[0];
 
@@ -39,16 +47,32 @@ export default function useToddlerGame(selectedProfile: string | null) {
     ]).start();
   };
 
-  const playAnimalSound = async (soundFile: any) => {
+  const speakInstruction = (animal: Animal) => {
+    Speech.speak(`Find the ${animal.name}`);
+  };
+
+  const playSound = async (soundFile: number) => {
     const { sound } = await Audio.Sound.createAsync(soundFile);
     await sound.playAsync();
   };
 
-  const chooseRandomAnimal = () => {
-    const visibleAnimals = animals.slice(0, level + 2);
-    const randomIndex = Math.floor(Math.random() * visibleAnimals.length);
+  const playAnimalSound = async (animal: Animal) => {
+    if (animal.sound) {
+      await playSound(animal.sound);
+      return;
+    }
 
-    setTargetAnimal(visibleAnimals[randomIndex]);
+    Speech.speak(animal.name);
+  };
+
+  const chooseRandomAnimal = (levelOverride = level, announce = true) => {
+    const nextAnimal = getRandomAnimal(levelOverride);
+
+    setTargetAnimal(nextAnimal);
+
+    if (announce) {
+      speakInstruction(nextAnimal);
+    }
   };
 
   const saveBadge = async (newBadge: string) => {
@@ -86,31 +110,46 @@ export default function useToddlerGame(selectedProfile: string | null) {
     }
   };
 
+  const clearFeedbackSoon = () => {
+    setTimeout(() => {
+      setFeedback(null);
+      setShowStars(false);
+    }, 1400);
+  };
+
   const handleAnimalPress = (animal: Animal) => {
+    if (!targetAnimal) {
+      chooseRandomAnimal();
+      return;
+    }
+
     setSelectedAnimal(animal.name);
     animateButton();
-    playAnimalSound(animal.sound);
+    playAnimalSound(animal);
 
-    if (targetAnimal?.name !== animal.name) {
-      Speech.speak('Try Again');
+    if (targetAnimal.name !== animal.name) {
+      setFeedback('wrong');
+      Speech.speak('Try again');
+      clearFeedbackSoon();
       return;
     }
 
     const newScore = score + 1;
     const newLevel = newScore % 3 === 0 ? level + 1 : level;
+    const didLevelUp = newLevel > level;
 
     setScore(newScore);
     setLevel(newLevel);
     setShowStars(true);
+    setFeedback(didLevelUp ? 'level-up' : 'correct');
     checkBadge(newScore);
     saveProgress(newScore, newLevel);
-    Speech.speak(newLevel > level ? 'Level Up!' : 'Great Job!');
+    Speech.speak(didLevelUp ? 'Level up!' : 'Great job!');
+    clearFeedbackSoon();
 
     setTimeout(() => {
-      setShowStars(false);
-    }, 1500);
-
-    chooseRandomAnimal();
+      chooseRandomAnimal(newLevel);
+    }, 900);
   };
 
   const saveProgress = async (newScore: number, newLevel: number) => {
@@ -137,18 +176,17 @@ export default function useToddlerGame(selectedProfile: string | null) {
       const savedScore = await AsyncStorage.getItem(`score_${selectedProfile}`);
       const savedLevel = await AsyncStorage.getItem(`level_${selectedProfile}`);
       const savedBadge = await AsyncStorage.getItem(`badge_${selectedProfile}`);
+      const loadedScore = savedScore !== null ? JSON.parse(savedScore) : 0;
+      const loadedLevel = savedLevel !== null ? JSON.parse(savedLevel) : 1;
 
-      if (savedScore !== null) {
-        setScore(JSON.parse(savedScore));
-      }
-
-      if (savedLevel !== null) {
-        setLevel(JSON.parse(savedLevel));
-      }
+      setScore(loadedScore);
+      setLevel(loadedLevel);
 
       if (savedBadge !== null) {
         setBadge(JSON.parse(savedBadge));
       }
+
+      chooseRandomAnimal(loadedLevel, false);
     } catch (error) {
       console.log('Load error', error);
     }
@@ -161,6 +199,7 @@ export default function useToddlerGame(selectedProfile: string | null) {
     showStars,
     level,
     scaleAnim,
+    feedback,
     setSelectedAnimal,
     animateButton,
     playAnimalSound,

@@ -1,50 +1,64 @@
-# Welcome to your Expo app 👋
+# Kids App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile-first Expo app for children to learn animals through simple games,
+sounds, speech, profiles, badges, and parent progress tracking.
+
+## What is included
+
+- Child profiles with avatars
+- Little Kids animal matching game
+- Score, level, stars, and animal badges
+- Unlockable memory game
+- Parent dashboard with per-child progress
+- Big Kids name greeting screen with English and Urdu text
+- Quiz screen placeholder for the next game mode
+
+## Tech stack
+
+- Expo
+- React Native
+- Expo Router
+- TypeScript
+- AsyncStorage
+- Expo AV and Speech
 
 ## Get started
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+Install dependencies:
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Start the app:
 
-## Learn more
+```bash
+npm.cmd run start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+On Windows PowerShell, use `npm.cmd` if `npm` is blocked by the system script
+execution policy.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Useful commands
 
-## Join the community
+```bash
+npm.cmd run lint
+npm.cmd run android
+npm.cmd run ios
+npm.cmd run web
+```
 
-Join our community of developers creating universal apps.
+## Project shape
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- `app/(tabs)/index.tsx` controls the main app flow.
+- `screens/` contains the child-facing games and parent dashboard.
+- `hooks/useToddlerGame.ts` manages score, levels, sounds, and badge progress.
+- `data/animals.ts` defines the animal images, colors, and sounds.
+- `assets/images/` and `assets/sounds/` contain the learning assets.
+
+## Next improvements
+
+- Build the quiz game mode.
+- Move repeated button styles into shared components.
+- Add stronger types for game props and animal sound assets.
+- Improve layout polish across phone, tablet, and web.
