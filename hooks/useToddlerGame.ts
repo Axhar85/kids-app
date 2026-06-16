@@ -14,6 +14,14 @@ const getRandomAnimal = (level: number) => {
   return visibleAnimals[randomIndex] ?? animals[0];
 };
 
+const normalizeSavedBadge = (savedBadge: string) => {
+  if (savedBadge.includes('Animal Master')) return 'Animal Master';
+  if (savedBadge.includes('Animal Expert')) return 'Animal Expert';
+  if (savedBadge.includes('Animal Explorer')) return 'Animal Explorer';
+
+  return savedBadge;
+};
+
 export default function useToddlerGame(selectedProfile: string | null) {
   const [targetAnimal, setTargetAnimal] = useState<Animal | null>(null);
   const [score, setScore] = useState(0);
@@ -92,11 +100,11 @@ export default function useToddlerGame(selectedProfile: string | null) {
     let newBadge = '';
 
     if (newScore >= 10) {
-      newBadge = '🥇 Animal Master';
+      newBadge = 'Animal Master';
     } else if (newScore >= 5) {
-      newBadge = '🥈 Animal Expert';
+      newBadge = 'Animal Expert';
     } else if (newScore >= 1) {
-      newBadge = '🥉 Animal Explorer';
+      newBadge = 'Animal Explorer';
     }
 
     if (newBadge && newBadge !== badge) {
@@ -183,7 +191,7 @@ export default function useToddlerGame(selectedProfile: string | null) {
       setLevel(loadedLevel);
 
       if (savedBadge !== null) {
-        setBadge(JSON.parse(savedBadge));
+        setBadge(normalizeSavedBadge(JSON.parse(savedBadge)));
       }
 
       chooseRandomAnimal(loadedLevel, false);

@@ -26,13 +26,8 @@ export default function HomeScreen() {
     showStars,
     level,
     scaleAnim,
-    setSelectedAnimal,
-    animateButton,
-    playAnimalSound,
-    setScore,
-    setShowStars,
+    feedback,
     chooseRandomAnimal,
-    setLevel,
     handleAnimalPress,
     badge,
     showBadgePopup,
@@ -86,13 +81,8 @@ export default function HomeScreen() {
         targetAnimal={targetAnimal}
         selectedAnimal={selectedAnimal}
         scaleAnim={scaleAnim}
-        setSelectedAnimal={setSelectedAnimal}
-        animateButton={animateButton}
-        playAnimalSound={playAnimalSound}
-        setScore={setScore}
-        setShowStars={setShowStars}
+        feedback={feedback}
         chooseRandomAnimal={chooseRandomAnimal}
-        setLevel={setLevel}
         setMode={setMode}
         handleAnimalPress={handleAnimalPress}
         badge={badge}

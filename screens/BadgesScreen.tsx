@@ -6,9 +6,9 @@ type BadgesScreenProps = {
 };
 
 const badges = [
-  '🥉 Animal Explorer',
-  '🥈 Animal Expert',
-  '🥇 Animal Master',
+  { name: 'Animal Explorer', icon: '\uD83E\uDD49' },
+  { name: 'Animal Expert', icon: '\uD83E\uDD48' },
+  { name: 'Animal Master', icon: '\uD83E\uDD47' },
 ];
 
 export default function BadgesScreen({
@@ -31,21 +31,25 @@ export default function BadgesScreen({
           marginBottom: 20,
         }}
       >
-        🏅 My Badges
+        {'\uD83C\uDFC5'} My Badges
       </Text>
 
-      {badges.map((item) => (
-        <Text
-          key={item}
-          style={{
-            fontSize: 22,
-            marginBottom: 10,
-          }}
-        >
-          {item === badge ? '✅ ' : '❌ '}
-          {item}
-        </Text>
-      ))}
+      {badges.map((item) => {
+        const isUnlocked = item.name === badge;
+
+        return (
+          <Text
+            key={item.name}
+            style={{
+              fontSize: 22,
+              marginBottom: 10,
+            }}
+          >
+            {isUnlocked ? '\u2705 ' : '\u274C '}
+            {item.icon} {item.name}
+          </Text>
+        );
+      })}
 
       <TouchableOpacity onPress={() => setShowBadges(false)}>
         <Text
@@ -55,7 +59,7 @@ export default function BadgesScreen({
             fontSize: 20,
           }}
         >
-          ⬅ Back
+          {'\u2B05'} Back
         </Text>
       </TouchableOpacity>
     </View>
