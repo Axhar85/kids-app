@@ -17,6 +17,7 @@ export default function HomeScreen() {
   const [mode, setMode] = useState<string | null>(null);
   const [showDashboard, setShowDashboard] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<string | null>(null);
+  const [selectedProfileAvatar, setSelectedProfileAvatar] = useState('');
   const [showBadges, setShowBadges] = useState(false);
 
   const {
@@ -54,7 +55,12 @@ export default function HomeScreen() {
   }
 
   if (!selectedProfile) {
-    return <ProfileSelection setSelectedProfile={setSelectedProfile} />;
+    return (
+      <ProfileSelection
+        setSelectedProfile={setSelectedProfile}
+        setSelectedProfileAvatar={setSelectedProfileAvatar}
+      />
+    );
   }
 
   if (!mode) {
@@ -62,6 +68,7 @@ export default function HomeScreen() {
       <ModeSelection
         setMode={setMode}
         selectedProfile={selectedProfile}
+        selectedProfileAvatar={selectedProfileAvatar}
         setShowDashboard={setShowDashboard}
         level={level}
       />

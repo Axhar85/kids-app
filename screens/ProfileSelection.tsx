@@ -17,17 +17,28 @@ type Profile = {
 
 type ProfileSelectionProps = {
   setSelectedProfile: (profileName: string) => void;
+  setSelectedProfileAvatar: (avatar: string) => void;
 };
 
-const avatars = ['👦', '👧', '🦸', '👸', '🦁', '🚀', '🐶', '🐱'];
+const avatars = [
+  '\uD83D\uDC66',
+  '\uD83D\uDC67',
+  '\uD83E\uDDB8',
+  '\uD83D\uDC78',
+  '\uD83E\uDD81',
+  '\uD83D\uDE80',
+  '\uD83D\uDC36',
+  '\uD83D\uDC31',
+];
 const progressKeys = ['score', 'level', 'badge', 'memoryBadge', 'gamesPlayed'];
 
 export default function ProfileSelection({
   setSelectedProfile,
+  setSelectedProfileAvatar,
 }: ProfileSelectionProps) {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [newName, setNewName] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState('👦');
+  const [selectedAvatar, setSelectedAvatar] = useState(avatars[0]);
   const [editingAvatarFor, setEditingAvatarFor] = useState<string | null>(null);
   const [renamingProfile, setRenamingProfile] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
@@ -45,12 +56,17 @@ export default function ProfileSelection({
     }
 
     const defaultProfiles = [
-      { name: 'Ali', avatar: '👦' },
-      { name: 'Sara', avatar: '👧' },
+      { name: 'Ali', avatar: avatars[0] },
+      { name: 'Sara', avatar: avatars[1] },
     ];
 
     setProfiles(defaultProfiles);
     await AsyncStorage.setItem('profiles', JSON.stringify(defaultProfiles));
+  };
+
+  const selectProfile = (profile: Profile) => {
+    setSelectedProfile(profile.name);
+    setSelectedProfileAvatar(profile.avatar);
   };
 
   const addProfile = async () => {
@@ -68,7 +84,7 @@ export default function ProfileSelection({
     await AsyncStorage.setItem('profiles', JSON.stringify(updatedProfiles));
 
     setNewName('');
-    setSelectedAvatar('👦');
+    setSelectedAvatar(avatars[0]);
   };
 
   const removeProfile = async (profileName: string) => {
@@ -178,7 +194,7 @@ export default function ProfileSelection({
             }}
           >
             <TouchableOpacity
-              onPress={() => setSelectedProfile(profile.name)}
+              onPress={() => selectProfile(profile)}
               style={{
                 backgroundColor: '#4CAF50',
                 padding: 15,
@@ -216,7 +232,7 @@ export default function ProfileSelection({
                   fontSize: 20,
                 }}
               >
-                🎨
+                {'\uD83C\uDFA8'}
               </Text>
             </TouchableOpacity>
 
@@ -229,7 +245,7 @@ export default function ProfileSelection({
                 borderRadius: 15,
               }}
             >
-              <Text style={{ fontSize: 20 }}>✏️</Text>
+              <Text style={{ fontSize: 20 }}>{'\u270F\uFE0F'}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -247,7 +263,7 @@ export default function ProfileSelection({
                   fontSize: 20,
                 }}
               >
-                ❌
+                {'\u274C'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -290,7 +306,7 @@ export default function ProfileSelection({
           marginBottom: 10,
         }}
       >
-        ➕ Add New Kid
+        {'\u2795'} Add New Kid
       </Text>
 
       <TextInput

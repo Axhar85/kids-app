@@ -106,8 +106,12 @@ export default function useToddlerGame(selectedProfile: string | null) {
 
   const playAnimalSound = async (animal: Animal) => {
     if (animal.sound) {
-      await playSound(animal.sound, animal.soundMaxMs);
-      return;
+      try {
+        await playSound(animal.sound, animal.soundMaxMs);
+        return;
+      } catch (error) {
+        console.log('Animal sound error', error);
+      }
     }
 
     await stopCurrentSound();
