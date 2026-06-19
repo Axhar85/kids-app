@@ -42,11 +42,12 @@ export default function HomeScreen() {
   };
 
   const speakName = () => {
-    if (!name) return;
+    if (!name.trim()) return;
 
     const text =
       language === 'en' ? `Hello ${name}` : `السلام علیکم ${name}`;
 
+    Speech.stop();
     Speech.speak(text);
   };
 
