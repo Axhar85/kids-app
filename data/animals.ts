@@ -13,7 +13,7 @@ export type Animal = {
 const animals: Animal[] = [
   {
     name: 'Dog',
-    image: require('../assets/images/animals/dog.png'),
+    image: require('../assets/images/animals/dog.webp'),
     sound: require('../assets/sounds/animals/dog.wav'),
     soundMaxMs: 1200,
     fallbackSoundText: 'Dog',
@@ -64,6 +64,34 @@ const animals: Animal[] = [
     fallbackSoundText: 'Monkey',
     color: '#BA68C8',
     unlockLevel: 4,
+  },
+  {
+    name: 'Horse',
+    image: require('../assets/images/animals/horse.webp'),
+    fallbackSoundText: 'Horse',
+    color: '#A1887F',
+    unlockLevel: 5,
+  },
+  {
+    name: 'Goat',
+    image: require('../assets/images/animals/goat.png'),
+    fallbackSoundText: 'Goat',
+    color: '#AED581',
+    unlockLevel: 6,
+  },
+  {
+    name: 'Donkey',
+    image: require('../assets/images/animals/donkey.webp'),
+    fallbackSoundText: 'Donkey',
+    color: '#90A4AE',
+    unlockLevel: 7,
+  },
+  {
+    name: 'Wolf',
+    image: require('../assets/images/animals/wolf.webp'),
+    fallbackSoundText: 'Wolf',
+    color: '#7986CB',
+    unlockLevel: 8,
   },
 ];
 

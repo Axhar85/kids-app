@@ -19,21 +19,21 @@ type MemoryGameProps = {
 const difficultyConfig = {
   easy: {
     label: 'Easy',
-    pairs: 3,
+    pairs: 4,
     color: '#4CAF50',
     achievement: 'Memory Beginner',
     stars: 1,
   },
   medium: {
     label: 'Medium',
-    pairs: 4,
+    pairs: 6,
     color: '#FFC107',
     achievement: 'Memory Expert',
     stars: 2,
   },
   hard: {
     label: 'Hard',
-    pairs: 6,
+    pairs: animals.length,
     color: '#F44336',
     achievement: 'Memory Master',
     stars: 3,
