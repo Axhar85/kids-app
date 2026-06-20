@@ -45,7 +45,7 @@ const gameModes: GameMode[] = [
   {
     id: 'quiz',
     title: 'Quiz Game',
-    subtitle: 'Flags, math, spelling, and science soon.',
+    subtitle: 'Math, spelling, science, and capitals.',
     icon: '\uD83E\uDDE0',
     color: '#673AB7',
     unlockLevel: 5,
