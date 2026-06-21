@@ -119,7 +119,7 @@ export default function MemoryGame({
     setMemoryAchievement(achievement);
     saveMemoryWin();
     saveMemoryAchievement(achievement);
-    playSound(require('../assets/sounds/win.mp3'));
+    playSound(require('../assets/sounds/animals/win.mp3'));
   };
 
   const handleCardPress = (index: number) => {
@@ -138,7 +138,7 @@ export default function MemoryGame({
     const secondCard = cards[newFlipped[1]];
 
     if (firstCard.animal.name === secondCard.animal.name) {
-      playSound(require('../assets/sounds/correct.mp3'));
+      playSound(require('../assets/sounds/animals/correct.mp3'));
 
       const newScore = score + 1;
       const newMatched = [...matched, ...newFlipped];
@@ -154,7 +154,7 @@ export default function MemoryGame({
       return;
     }
 
-    playSound(require('../assets/sounds/wrong.mp3'));
+    playSound(require('../assets/sounds/animals/wrong.mp3'));
     setTimeout(() => {
       setFlipped([]);
     }, 850);

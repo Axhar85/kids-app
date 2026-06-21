@@ -91,7 +91,7 @@ export default function useToddlerGame(selectedProfile: string | null) {
     }
   };
 
-  const playSound = async (soundFile: number, maxMs = 1400) => {
+  const playSound = async (soundFile: number, maxMs = 5000) => {
     await stopCurrentSound();
 
     const { sound } = await Audio.Sound.createAsync(soundFile);
@@ -171,14 +171,14 @@ export default function useToddlerGame(selectedProfile: string | null) {
   };
 
   const handleAnimalPress = (animal: Animal) => {
+    setSelectedAnimal(animal.name);
+    animateButton();
+    playAnimalSound(animal);
+
     if (!targetAnimal) {
       chooseRandomAnimal();
       return;
     }
-
-    setSelectedAnimal(animal.name);
-    animateButton();
-    playAnimalSound(animal);
 
     if (targetAnimal.name !== animal.name) {
       setFeedback('wrong');

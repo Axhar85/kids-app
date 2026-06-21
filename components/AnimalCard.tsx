@@ -27,6 +27,7 @@ export default function AnimalCard({
       <TouchableOpacity
         activeOpacity={0.85}
         onPress={onPress}
+        accessibilityLabel={`Play ${animal.name} sound`}
         style={{
           backgroundColor: animal.color,
           width: 148,
@@ -62,6 +63,17 @@ export default function AnimalCard({
           }}
         >
           {animal.name}
+        </Text>
+
+        <Text
+          style={{
+            fontSize: 13,
+            color: '#455A64',
+            marginTop: 4,
+            fontWeight: '700',
+          }}
+        >
+          {'\uD83D\uDD0A'} Tap to hear
         </Text>
       </TouchableOpacity>
     </Animated.View>

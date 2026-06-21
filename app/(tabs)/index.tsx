@@ -2,6 +2,7 @@ import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 import { useState } from 'react';
 import useToddlerGame from '../../hooks/useToddlerGame';
+import AnimalSoundsGame from '../../screens/AnimalSoundsGame';
 import BadgesScreen from '../../screens/BadgesScreen';
 import BigKidsGame from '../../screens/BigKidsGame';
 import MemoryGame from '../../screens/MemoryGame';
@@ -36,7 +37,7 @@ export default function HomeScreen() {
 
   const playSound = async () => {
     const { sound } = await Audio.Sound.createAsync(
-      require('../../assets/sounds/hello.mp3')
+      require('../../assets/sounds/animals/hello.mp3')
     );
     await sound.playAsync();
   };
@@ -49,6 +50,14 @@ export default function HomeScreen() {
 
     Speech.stop();
     Speech.speak(text);
+  };
+
+  const goToProfileSelection = () => {
+    setMode(null);
+    setShowDashboard(false);
+    setShowBadges(false);
+    setSelectedProfile(null);
+    setSelectedProfileAvatar('');
   };
 
   if (showDashboard) {
@@ -70,6 +79,7 @@ export default function HomeScreen() {
         setMode={setMode}
         selectedProfile={selectedProfile}
         selectedProfileAvatar={selectedProfileAvatar}
+        goToProfileSelection={goToProfileSelection}
         setShowDashboard={setShowDashboard}
         level={level}
       />
@@ -78,6 +88,10 @@ export default function HomeScreen() {
 
   if (showBadges) {
     return <BadgesScreen badge={badge} setShowBadges={setShowBadges} />;
+  }
+
+  if (mode === 'sounds') {
+    return <AnimalSoundsGame setMode={setMode} />;
   }
 
   if (mode === 'toddler') {

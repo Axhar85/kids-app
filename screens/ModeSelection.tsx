@@ -13,6 +13,7 @@ type ModeSelectionProps = {
   setMode: (mode: string) => void;
   selectedProfile: string;
   selectedProfileAvatar: string;
+  goToProfileSelection: () => void;
   setShowDashboard: (show: boolean) => void;
   level: number;
 };
@@ -24,6 +25,14 @@ const gameModes: GameMode[] = [
     subtitle: 'Listen, look, and find the animal.',
     icon: '\uD83D\uDC3E',
     color: '#FF9800',
+    unlockLevel: 1,
+  },
+  {
+    id: 'sounds',
+    title: 'Animal Sounds',
+    subtitle: 'Tap animals and hear their sounds.',
+    icon: '\uD83D\uDD0A',
+    color: '#8BC34A',
     unlockLevel: 1,
   },
   {
@@ -56,6 +65,7 @@ export default function ModeSelection({
   setMode,
   selectedProfile,
   selectedProfileAvatar,
+  goToProfileSelection,
   setShowDashboard,
   level,
 }: ModeSelectionProps) {
@@ -144,6 +154,28 @@ export default function ModeSelection({
             </Text>
           </View>
         </View>
+
+        <TouchableOpacity
+          onPress={goToProfileSelection}
+          style={{
+            backgroundColor: '#E3F2FD',
+            borderRadius: 14,
+            paddingVertical: 11,
+            paddingHorizontal: 14,
+            marginTop: 14,
+            alignItems: 'center',
+          }}
+        >
+          <Text
+            style={{
+              color: '#1565C0',
+              fontSize: 16,
+              fontWeight: '800',
+            }}
+          >
+            {'\uD83C\uDFE0'} Change Player
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <View
