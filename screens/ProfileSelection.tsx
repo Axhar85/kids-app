@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import {
-  Alert,
   Modal,
   ScrollView,
   Text,
@@ -41,6 +40,7 @@ export default function ProfileSelection({
   const [selectedAvatar, setSelectedAvatar] = useState(avatars[0]);
   const [editingAvatarFor, setEditingAvatarFor] = useState<string | null>(null);
   const [renamingProfile, setRenamingProfile] = useState<string | null>(null);
+  const [deletingProfile, setDeletingProfile] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
 
   useEffect(() => {
@@ -55,13 +55,7 @@ export default function ProfileSelection({
       return;
     }
 
-    const defaultProfiles = [
-      { name: 'Ali', avatar: avatars[0] },
-      { name: 'Sara', avatar: avatars[1] },
-    ];
-
-    setProfiles(defaultProfiles);
-    await AsyncStorage.setItem('profiles', JSON.stringify(defaultProfiles));
+    setProfiles([]);
   };
 
   const selectProfile = (profile: Profile) => {
@@ -101,18 +95,14 @@ export default function ProfileSelection({
   };
 
   const deleteProfile = (profileName: string) => {
-    Alert.alert(
-      'Delete profile?',
-      `This will remove ${profileName}'s saved progress.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => removeProfile(profileName),
-        },
-      ]
-    );
+    setDeletingProfile(profileName);
+  };
+
+  const confirmDeleteProfile = async () => {
+    if (!deletingProfile) return;
+
+    await removeProfile(deletingProfile);
+    setDeletingProfile(null);
   };
 
   const startRenameProfile = (profileName: string) => {
@@ -198,6 +188,50 @@ export default function ProfileSelection({
       </View>
 
       <View style={{ width: '100%', maxWidth: 440 }}>
+        {profiles.length === 0 && (
+          <View
+            style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 18,
+              padding: 18,
+              marginBottom: 14,
+              borderWidth: 1,
+              borderColor: '#FFE0B2',
+              alignItems: 'center',
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 44,
+                marginBottom: 8,
+              }}
+            >
+              {'\uD83C\uDF1F'}
+            </Text>
+            <Text
+              style={{
+                fontSize: 21,
+                fontWeight: '900',
+                color: '#263238',
+                textAlign: 'center',
+                marginBottom: 6,
+              }}
+            >
+              No players yet
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                color: '#607D8B',
+                textAlign: 'center',
+                lineHeight: 20,
+              }}
+            >
+              Add a child profile below to start playing.
+            </Text>
+          </View>
+        )}
+
         {profiles.map((profile) => (
           <View
             key={profile.name}
@@ -537,6 +571,86 @@ export default function ProfileSelection({
                 }}
               >
                 <Text style={{ color: 'white', fontSize: 16 }}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        transparent
+        visible={!!deletingProfile}
+        animationType="fade"
+        onRequestClose={() => setDeletingProfile(null)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'rgba(0, 0, 0, 0.35)',
+            padding: 20,
+          }}
+        >
+          <View
+            style={{
+              width: '100%',
+              maxWidth: 330,
+              backgroundColor: 'white',
+              borderRadius: 16,
+              padding: 20,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 22,
+                fontWeight: 'bold',
+                marginBottom: 8,
+                color: '#263238',
+              }}
+            >
+              Delete profile?
+            </Text>
+
+            <Text
+              style={{
+                fontSize: 15,
+                color: '#607D8B',
+                lineHeight: 21,
+                marginBottom: 18,
+              }}
+            >
+              This will remove {deletingProfile}'s saved progress from this
+              device.
+            </Text>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => setDeletingProfile(null)}
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 14,
+                  marginRight: 8,
+                }}
+              >
+                <Text style={{ fontSize: 16 }}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={confirmDeleteProfile}
+                style={{
+                  backgroundColor: '#F44336',
+                  paddingVertical: 10,
+                  paddingHorizontal: 18,
+                  borderRadius: 10,
+                }}
+              >
+                <Text style={{ color: 'white', fontSize: 16 }}>Delete</Text>
               </TouchableOpacity>
             </View>
           </View>
